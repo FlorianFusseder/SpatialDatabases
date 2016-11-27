@@ -1,0 +1,48 @@
+.flex-container {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex; /* or inline-flex */
+}
+
+#left-nav {
+    width: 320px;
+    margin-left: -271px;
+}
+#right-nav {
+    width: 320px;
+    margin-right: -271px;
+}
+
+.top-right {
+    float: right;
+    margin: 8px !important;
+}
+.top-right:after {
+    clear: both;
+    content: '';
+}
+
+.top-left {
+    float: left;
+    margin: 8px !important;
+}
+.top-left:after {
+    clear: both;
+    content: '';
+}
+
+#map {
+    -webkit-box-flex: 1;
+    -webkit-flex-grow: 1;
+    -ms-flex-positive: 1;
+    flex-grow: 1;
+}
+
+.fullscreen {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
