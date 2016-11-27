@@ -14,6 +14,9 @@
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.6/semantic.min.js"></script>
     <link rel="stylesheet" media="screen" href="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.6/semantic.min.css">
 
+    <script src='./range.js'></script>
+    <link href='./range.css' rel='stylesheet' />
+
     <!-- Internal Imports -->
     <link href='./style.css' rel='stylesheet'/>
   </head>
@@ -22,6 +25,18 @@
     <div class="fullscreen flex-container">
       <div id="left-nav">
         <i class="top-right big search icon" id="toggle-left-nav"></i>
+        <div style="display: block; clear: both;"></div>
+
+        <div class="ui vertical segment" style="margin: 8px;">
+          <div class="ui form">
+            <label id="are-range-label">Area</label>
+            <div class="ui range" id="area-range"></div>
+          </div>
+          <div class="ui form">
+            <label id="length-range-label">Length Importance</label>
+            <div class="ui range" id="length-range"></div>
+          </div>
+        </div>
       </div>
 
       <div id="map">
@@ -30,6 +45,10 @@
 
       <div id="right-nav">
         <i class="top-left big tasks icon" id="toggle-right-nav"></i>
+        <div style="display: block; clear: both;"></div>
+
+        <div class="ui grid">
+        </div>
       </div>
     </div>
 

@@ -5,6 +5,10 @@
     display: flex; /* or inline-flex */
 }
 
+.light-margin {
+    margin: 8px;
+}
+
 #left-nav {
     width: 320px;
     margin-left: -271px;
@@ -18,18 +22,9 @@
     float: right;
     margin: 8px !important;
 }
-.top-right:after {
-    clear: both;
-    content: '';
-}
-
 .top-left {
     float: left;
     margin: 8px !important;
-}
-.top-left:after {
-    clear: both;
-    content: '';
 }
 
 #map {

@@ -32,17 +32,22 @@ var map = initializeMap();
 
 // Holds the current GeoJSON data displayed on the map
 var currentData;
+var currentLayer;
 // Will be computed to find correct colors of sectors
 var maxValuation;
 var minValuation;
+// Hold user input values
+var areaImportance = 0;
+var lengthImportance = 0;
+
 
 // Load our data
 $.get(dataSource)
     .done(function (data) {
       currentData = weightGeoJson(data);
 
-      var geoJson = L.geoJson(data, { style: style });
-      geoJson.addTo(map);
+      currentLayer = L.geoJson(currentData, { style: style });
+      currentLayer.addTo(map);
     })
     .fail(function () {
       console.log('Error loading geoJSON file!');
@@ -104,7 +109,8 @@ function weightGeoJson(geoJson) {
   geoJson.features.forEach(function (feature) {
     feature.valuation = 0;
 
-    feature.valuation += testValuation(feature);
+    feature.valuation += areaValuation(feature);
+    feature.valuation += lengthValuation(feature);
     // TODO: Add proper valuation functions for different feature aspects
 
     // Keep minimum and maximum, useful to get good colors for the map
@@ -121,8 +127,11 @@ function weightGeoJson(geoJson) {
 
 // Values a given feature by using an algorithm.
 // Returns positive or negative values based on how good this given feature is.
-function testValuation(feature) {
-  return feature.properties.shape_area;
+function areaValuation(feature) {
+  return feature.properties.shape_area * areaImportance;
+}
+function lengthValuation(feature) {
+  return feature.properties.shape_leng * lengthImportance;
 }
 
 // TODO: Add proper valuation functions for different feature aspects
@@ -131,25 +140,52 @@ function testValuation(feature) {
 ////////////////////////////////////
 // UI Code
 ////////////////////////////////////
-$('#toggle-left-nav').click(function () {
-  var $leftNav = $('#left-nav');
+$(document).ready(function () {
+  $('#toggle-left-nav').click(function () {
+    var $leftNav = $('#left-nav');
 
-  if ($leftNav.css('margin-left').replace('px', '') < 0) {
-    $leftNav.animate({ 'margin-left': 0 }, { step: animationStep });
-  } else {
-    $leftNav.animate({ 'margin-left': -271 }, { step: animationStep });
-  }
+    if ($leftNav.css('margin-left').replace('px', '') < 0) {
+      $leftNav.animate({'margin-left': 0}, {step: animationStep});
+    } else {
+      $leftNav.animate({'margin-left': -271}, {step: animationStep});
+    }
+  });
+
+  $('#toggle-right-nav').click(function () {
+    var $rightNav = $('#right-nav');
+
+    if ($rightNav.css('margin-right').replace('px', '') < 0) {
+      $rightNav.animate({'margin-right': 0}, {step: animationStep});
+    } else {
+      $rightNav.animate({'margin-right': -271}, {step: animationStep});
+    }
+  });
+
+  $('#area-range').range({
+    min: -5,
+    max: 5,
+    start: 0,
+    step: 1,
+    onChange: function (val) { areaImportance = val; updateUi(); },
+  });
+  $('#length-range').range({
+    min: -5,
+    max: 5,
+    start: 0,
+    step: 1,
+    onChange: function (val) { lengthImportance = val; updateUi(); },
+  });
 });
 
-$('#toggle-right-nav').click(function () {
-  var $rightNav = $('#right-nav');
+function updateUi() {
+  $('#are-range-label').html('Area (' + areaImportance + ')');
+  $('#length-range-label').html('Length (' + lengthImportance + ')');
 
-  if ($rightNav.css('margin-right').replace('px', '') < 0) {
-    $rightNav.animate({ 'margin-right': 0 }, { step: animationStep });
-  } else {
-    $rightNav.animate({ 'margin-right': -271 }, { step: animationStep });
+  if (currentLayer) {
+    weightGeoJson(currentData);
+    currentLayer.setStyle(style);
   }
-});
+}
 
 function animationStep(now, tween) {
   map.invalidateSize();
