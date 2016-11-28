@@ -44,10 +44,11 @@ var lengthImportance = 0;
 // Load our data
 $.get(dataSource)
     .done(function (data) {
-      currentData = weightGeoJson(data);
-
+      currentData = data;
       currentLayer = L.geoJson(currentData, { style: style });
       currentLayer.addTo(map);
+
+      updateUi();
     })
     .fail(function () {
       console.log('Error loading geoJSON file!');
@@ -103,9 +104,6 @@ function style(feature) {
 // Applies the user selected ratings to the given geo json.
 // Will add an additional 'valuation' property to each feature.
 function weightGeoJson(geoJson) {
-  maxValuation = Number.MIN_VALUE;
-  minValuation = Number.MAX_VALUE;
-
   geoJson.features.forEach(function (feature) {
     feature.valuation = 0;
 
@@ -121,6 +119,12 @@ function weightGeoJson(geoJson) {
       minValuation = feature.valuation;
     }
   });
+
+  geoJson.features.sort(function (a, b) {
+    return b.valuation - a.valuation;
+  });
+  maxValuation = geoJson.features[0].valuation;
+  minValuation = geoJson.features[geoJson.features.length - 1].valuation;
 
   return geoJson;
 }
@@ -181,8 +185,23 @@ function updateUi() {
   $('#are-range-label').html('Area (' + areaImportance + ')');
   $('#length-range-label').html('Length (' + lengthImportance + ')');
 
-  if (currentLayer) {
+  if (currentData) {
     weightGeoJson(currentData);
+
+    var resultHtml = '';
+    currentData.features.forEach(function (feature) {
+      resultHtml += '<div class="card">' +
+                      '<div class ="content">' +
+                        '<div class="header">' + feature.properties.ntaname + '</div>' +
+                        '<div class="meta">' + feature.properties.boro_name + '</div>' +
+                      '</div>' +
+                    '</div>';
+    });
+
+    $('#result-list').html(resultHtml);
+  }
+
+  if (currentLayer) {
     currentLayer.setStyle(style);
   }
 }

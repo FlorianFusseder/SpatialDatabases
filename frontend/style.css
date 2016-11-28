@@ -17,6 +17,12 @@
     width: 320px;
     margin-right: -271px;
 }
+.nav-content {
+    padding: 8px;
+
+    height: 100%;
+    overflow: scroll;
+}
 
 .top-right {
     float: right;

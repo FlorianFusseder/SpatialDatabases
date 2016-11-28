@@ -25,14 +25,14 @@
     <div class="fullscreen flex-container">
       <div id="left-nav">
         <i class="top-right big search icon" id="toggle-left-nav"></i>
-        <div style="display: block; clear: both;"></div>
 
-        <div class="ui vertical segment" style="margin: 8px;">
-          <div class="ui form">
+        <div class="nav-content">
+          <h2>Refine Search</h2>
+          <div class="ui vertical segment">
             <label id="are-range-label">Area</label>
             <div class="ui range" id="area-range"></div>
           </div>
-          <div class="ui form">
+          <div class="ui vertical segment">
             <label id="length-range-label">Length Importance</label>
             <div class="ui range" id="length-range"></div>
           </div>
@@ -45,9 +45,11 @@
 
       <div id="right-nav">
         <i class="top-left big tasks icon" id="toggle-right-nav"></i>
-        <div style="display: block; clear: both;"></div>
 
-        <div class="ui grid">
+        <div class="nav-content">
+          <h2>Results</h2>
+          <div class="ui cards" id="result-list"></div>
+        </div>
         </div>
       </div>
     </div>
