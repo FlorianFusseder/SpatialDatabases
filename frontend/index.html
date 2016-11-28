@@ -54,6 +54,90 @@
       </div>
     </div>
 
+    <div class="fullscreen new-york-background" style="z-index: 99999;" id="input-view">
+      <div class="ui container light-padding fill-parent">
+        <div class="ui segment fill-parent center aligned ">
+          <h1 class="ui header">
+            Move to New York
+          </h1>
+
+          <h2>Find your perfect spot in New York City</h2>
+          <div class="ui three ordered steps">
+            <div class="active step" id="first-step-indicator">
+              <div class="content">
+                <div class="title">General Info</div>
+                <div class="description">General Info about you</div>
+              </div>
+            </div>
+            <div class="step" id="second-step-indicator">
+              <div class="content">
+                <div class="title">Details</div>
+                <div class="description">Enter optional details for better results</div>
+              </div>
+            </div>
+            <div class="step" id="third-step-indicator">
+              <div class="content">
+                <div class="title">Finished</div>
+                <div class="description">View the results of your search</div>
+              </div>
+            </div>
+          </div>
+          <div class="ui segment left aligned" id="first-step">
+            <div class="ui form">
+              <div class="inline field">
+                <div class="ui checkbox">
+                  <input type="checkbox" tabindex="0" class="hidden" id="has-children">
+                  <label>Do you have children?</label>
+                </div>
+              </div>
+
+              <div class="inline field">
+                <div class="ui checkbox">
+                  <input type="checkbox" tabindex="0" class="hidden" name="has-car">
+                  <label>Do you have a car?</label>
+                </div>
+              </div>
+
+              <div class="inline field">
+                <div class="ui checkbox">
+                  <input type="checkbox" tabindex="0" class="hidden" name="likes-people">
+                  <label>Do you want to live in a vibrant neighborhood?</label>
+                </div>
+              </div>
+
+              <div class="inline field">
+                <div class="ui checkbox">
+                  <input type="checkbox" tabindex="0" class="hidden" name="needs-subway">
+                  <label>Do you need to take the subway often?</label>
+                </div>
+              </div>
+
+              <div class="ui submit button" id="finish-first-step">Next Step</div>
+            </div>
+          </div>
+
+          <div class="ui segment left aligned" id="second-step" hidden>
+            <div class="ui form">
+              <div class="inline field">
+                <div class="ui checkbox">
+                  <input type="checkbox" tabindex="0" class="hidden" name="more-details">
+                  <label>Ask more details, e.g. important locations.</label>
+                </div>
+              </div>
+
+              <div class="ui submit button" id="finish-second-step">Next Step</div>
+            </div>
+          </div>
+
+          <div class="ui segment left aligned" id="third-step" style="padding: 100px;" hidden>
+            <div class="ui active dimmer">
+              <div class="ui text loader">Searching...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Run our Programm -->
     <script src="./script.js"></script>
   </body>

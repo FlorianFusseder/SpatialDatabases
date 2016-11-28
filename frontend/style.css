@@ -8,6 +8,22 @@
 .light-margin {
     margin: 8px;
 }
+.light-padding {
+    padding: 8px;
+}
+.fill-parent {
+    height: 100%;
+    width: 100%;
+}
+
+.new-york-background {
+    background-image: url('http://wallpapercave.com/wp/CvFeXKY.jpg');
+
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
 
 #left-nav {
     width: 320px;
@@ -15,7 +31,6 @@
 }
 #right-nav {
     width: 320px;
-    margin-right: -271px;
 }
 .nav-content {
     padding: 8px;

@@ -181,6 +181,37 @@ $(document).ready(function () {
     step: 1,
     onChange: function (val) { lengthImportance = val; updateUi(); },
   });
+
+  $('.ui.checkbox').checkbox();
+
+  $('#finish-first-step').click(function () {
+    $('#first-step-indicator').toggleClass('completed');
+    $('#first-step-indicator').toggleClass('active');
+    $('#second-step-indicator').toggleClass('active');
+    $('#first-step').hide();
+    $('#second-step').show();
+  });
+
+  $('#finish-second-step').click(function () {
+    $('#second-step-indicator').toggleClass('completed');
+    $('#second-step-indicator').toggleClass('active');
+    $('#third-step-indicator').toggleClass('active');
+    $('#second-step').hide();
+    $('#third-step').show();
+
+    // TODO: Pre set the weighting sliders
+    // TODO: query for points that the user is interested in
+
+    if ($('#has-children').prop('checked') == true) {
+      $('#area-range').range('set value', 1);
+    } else {
+      $('#area-range').range('set value', -1);
+    }
+
+    setTimeout(function () {
+      $('#input-view').fadeOut();
+    }, 2000);
+  });
 });
 
 function updateUi() {
