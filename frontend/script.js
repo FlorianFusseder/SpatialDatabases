@@ -39,6 +39,8 @@ var minValuation;
 // Hold user input values
 var areaImportance = 0;
 var lengthImportance = 0;
+// Hold context between html ui elements and map elements
+var cardsForFeatures;
 
 
 // Load our data
@@ -189,6 +191,8 @@ function updateUi() {
     weightGeoJson(currentData);
 
     $('#result-list').html('');
+    cardsForFeatures = {};
+
     currentData.features.forEach(function (feature) {
       var nodeHtml =  '<a class="ui card" id="feature-card-' + feature.id + '">' +
                         '<div class ="content">' +
@@ -197,7 +201,7 @@ function updateUi() {
                         '</div>' +
                       '</a>';
 
-      $(nodeHtml).hover(
+      var node = $(nodeHtml).hover(
           function () {
             highlightFeature(feature);
           },
@@ -208,7 +212,10 @@ function updateUi() {
           function () {
             zoomToFeature(feature);
           }
-      ).appendTo($('#result-list'));
+      );
+      node.appendTo($('#result-list'));
+
+      cardsForFeatures[feature.id] = node;
     });
   }
 
@@ -235,18 +242,29 @@ function highlightFeature(feature) {
   if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
     layer.bringToFront();
   }
+
+  cardsForFeatures[feature.id].css('background-color', '#DCDCDC');
 }
 
 function resetHighlight(feature) {
   var layer = findLayer(feature);
 
   currentLayer.resetStyle(layer);
+
+  cardsForFeatures[feature.id].css('background-color', 'white');
 }
 
 function zoomToFeature(feature) {
   var layer = findLayer(feature);
 
   map.flyToBounds(layer.getBounds(), { padding: [150, 150] });
+
+  if (cardsForFeatures[feature.id].offset().top < 0 ||
+      cardsForFeatures[feature.id].offset().top > $('#right-nav-content').height()) {
+    $('#right-nav-content').animate({
+      scrollTop: $('#right-nav-content').scrollTop() + cardsForFeatures[feature.id].offset().top - 8,
+    }, 400);
+  }
 }
 
 function findLayer(feature) {
