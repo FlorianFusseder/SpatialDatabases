@@ -45,7 +45,7 @@ var lengthImportance = 0;
 $.get(dataSource)
     .done(function (data) {
       currentData = data;
-      currentLayer = L.geoJson(currentData, { style: style });
+      currentLayer = L.geoJson(currentData, { style: style, onEachFeature: onEachFeature });
       currentLayer.addTo(map);
 
       updateUi();
@@ -188,17 +188,28 @@ function updateUi() {
   if (currentData) {
     weightGeoJson(currentData);
 
-    var resultHtml = '';
+    $('#result-list').html('');
     currentData.features.forEach(function (feature) {
-      resultHtml += '<div class="card">' +
-                      '<div class ="content">' +
-                        '<div class="header">' + feature.properties.ntaname + '</div>' +
-                        '<div class="meta">' + feature.properties.boro_name + '</div>' +
-                      '</div>' +
-                    '</div>';
-    });
+      var nodeHtml =  '<a class="ui card" id="feature-card-' + feature.id + '">' +
+                        '<div class ="content">' +
+                          '<div class="header">' + feature.properties.ntaname + '</div>' +
+                          '<div class="meta">' + feature.properties.boro_name + '</div>' +
+                        '</div>' +
+                      '</a>';
 
-    $('#result-list').html(resultHtml);
+      $(nodeHtml).hover(
+          function () {
+            highlightFeature(feature);
+          },
+          function () {
+            resetHighlight(feature);
+          }
+      ).click(
+          function () {
+            zoomToFeature(feature);
+          }
+      ).appendTo($('#result-list'));
+    });
   }
 
   if (currentLayer) {
@@ -208,4 +219,49 @@ function updateUi() {
 
 function animationStep(now, tween) {
   map.invalidateSize();
+}
+
+// Highlight functions
+function highlightFeature(feature) {
+  var layer = findLayer(feature);
+
+  layer.setStyle({
+    weight: 5,
+    color: '#666',
+    dashArray: '',
+    fillOpacity: 0.7,
+  });
+
+  if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+    layer.bringToFront();
+  }
+}
+
+function resetHighlight(feature) {
+  var layer = findLayer(feature);
+
+  currentLayer.resetStyle(layer);
+}
+
+function zoomToFeature(feature) {
+  var layer = findLayer(feature);
+
+  map.flyToBounds(layer.getBounds(), { padding: [150, 150] });
+}
+
+function findLayer(feature) {
+  for (var key in currentLayer._layers) {
+    if (currentLayer._layers[key].feature.id == feature.id)
+      return currentLayer._layers[key];
+  }
+
+  return null;
+}
+
+function onEachFeature(feature, layer) {
+  layer.on({
+    mouseover: function (event) { highlightFeature(feature); },
+    mouseout: function (event) { resetHighlight(feature); },
+    click: function (event) { zoomToFeature(feature); },
+  });
 }
