@@ -20,7 +20,7 @@ var dataSource =  './geoserver/spt-project/ows' +
                   '?service=WFS' +
                   '&version=1.0.0' +
                   '&request=GetFeature' +
-                  '&typeName=spt-project:areas' +
+                  '&typeName=spt-project:area_ratings' +
                   '&maxFeatures=500' +
                   '&outputFormat=application%2Fjson'; // Output GeoJson for interactive display
 // dataSource = './areas.geojson';
@@ -38,7 +38,7 @@ var maxValuation;
 var minValuation;
 // Hold user input values
 var areaImportance = 0;
-var lengthImportance = 0;
+var centerImportance = 0;
 // Hold context between html ui elements and map elements
 var cardsForFeatures;
 
@@ -46,6 +46,8 @@ var cardsForFeatures;
 // Load our data
 $.get(dataSource)
     .done(function (data) {
+      console.log('Got Data');
+
       currentData = data;
       currentLayer = L.geoJson(currentData, { style: style, onEachFeature: onEachFeature });
       currentLayer.addTo(map);
@@ -110,7 +112,7 @@ function weightGeoJson(geoJson) {
     feature.valuation = 0;
 
     feature.valuation += areaValuation(feature);
-    feature.valuation += lengthValuation(feature);
+    feature.valuation += centerDistanceValuation(feature);
     // TODO: Add proper valuation functions for different feature aspects
 
     // Keep minimum and maximum, useful to get good colors for the map
@@ -134,10 +136,11 @@ function weightGeoJson(geoJson) {
 // Values a given feature by using an algorithm.
 // Returns positive or negative values based on how good this given feature is.
 function areaValuation(feature) {
-  return feature.properties.shape_area * areaImportance;
+  return feature.properties.size_rating * areaImportance;
 }
-function lengthValuation(feature) {
-  return feature.properties.shape_leng * lengthImportance;
+function centerDistanceValuation(feature) {
+  // Its better to be close to the center, so value it negative
+  return feature.properties.center_rating * centerImportance * -1;
 }
 
 // TODO: Add proper valuation functions for different feature aspects
@@ -174,12 +177,12 @@ $(document).ready(function () {
     step: 1,
     onChange: function (val) { areaImportance = val; updateUi(); },
   });
-  $('#length-range').range({
+  $('#center-range').range({
     min: -5,
     max: 5,
     start: 0,
     step: 1,
-    onChange: function (val) { lengthImportance = val; updateUi(); },
+    onChange: function (val) { centerImportance = val; updateUi(); },
   });
 
   $('.ui.checkbox').checkbox();
@@ -216,7 +219,7 @@ $(document).ready(function () {
 
 function updateUi() {
   $('#are-range-label').html('Area (' + areaImportance + ')');
-  $('#length-range-label').html('Length (' + lengthImportance + ')');
+  $('#center-range-label').html('Center (' + centerImportance + ')');
 
   if (currentData) {
     weightGeoJson(currentData);

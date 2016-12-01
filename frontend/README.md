@@ -12,11 +12,29 @@ To do so skip over the following sections and go directly to 'Quick Setup'.
 
 ## Setup Database
 
-TODO: Database Setup
+To setup the database you will import an dump of our postgres database.
+This will add all datasets that we have imported to your postgres database.
+
+The data is then composed in views to be presented in a consistent form to geoserver.
+See the setup_data_views.sql file for the general structure of the data views and how
+they are composed to the final view that is presented to geoserver.
 
 ## Setup GeoServer
 
-TODO: GeoServer Setup
+Start with a default geo server installation and follew the next steps:
+- Create Workspace
+  - Create a new Workspace
+  - Name: spt-project, URI: spt-project
+- Connect to the database
+  - Add Data Source
+  - Select PostGIS
+  - Select the spt-project Workspace
+  - Name the source spt-project
+  - Configure it to connect to spt-project database
+- Create the layer
+  - After connecting to the database you will see an view with the avaliable tabels/views
+  - Publish the area_ratings view/table
+- TODO: Read about caching
 
 ## Setup WebServer
 
