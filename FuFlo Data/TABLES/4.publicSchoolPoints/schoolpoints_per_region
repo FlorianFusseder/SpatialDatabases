@@ -1,0 +1,248 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 9.6.1
+-- Dumped by pg_dump version 9.6.1
+
+-- Started on 2016-12-05 23:12:48
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+SET row_security = off;
+
+SET search_path = public, pg_catalog;
+
+SET default_tablespace = '';
+
+SET default_with_oids = false;
+
+--
+-- TOC entry 314 (class 1259 OID 20282)
+-- Name: public_school_points_per_region; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public_school_points_per_region (
+    ntacode character varying(254),
+    total bigint
+);
+
+
+ALTER TABLE public_school_points_per_region OWNER TO postgres;
+
+--
+-- TOC entry 4228 (class 0 OID 20282)
+-- Dependencies: 314
+-- Data for Name: public_school_points_per_region; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public_school_points_per_region (ntacode, total) FROM stdin;
+QN02	9
+BX34	18
+SI05	3
+QN20	10
+SI11	3
+QN28	9
+QN38	4
+QN57	3
+BX01	26
+QN52	2
+QN41	3
+QN17	12
+BX09	23
+BX31	4
+SI45	5
+QN33	6
+MN36	12
+SI35	3
+MN21	14
+BX07	12
+BX75	15
+QN25	4
+QN19	3
+BK50	22
+BX27	11
+BK34	5
+BK90	7
+BX63	8
+MN33	28
+BX13	12
+BK76	6
+SI22	8
+SI24	8
+BK43	6
+BX98	0
+QN06	2
+QN56	5
+BK31	8
+BK64	6
+QN23	1
+MN03	25
+QN30	7
+MN09	7
+QN37	12
+QN47	4
+BX55	5
+MN15	14
+BX39	27
+QN76	7
+BK96	13
+MN01	9
+BK29	8
+BX08	15
+BK68	10
+MN40	4
+BX49	4
+BK58	5
+BK30	5
+QN34	5
+QN05	3
+BK26	10
+MN24	7
+QN68	11
+QN29	8
+QN70	9
+QN31	13
+QN66	3
+BK81	30
+BX03	8
+MN28	24
+SI25	2
+QN50	5
+BX14	27
+BK99	7
+QN49	4
+BX30	4
+BK60	17
+MN50	0
+BK40	2
+BX44	16
+BX36	14
+BX33	17
+QN10	10
+SI28	5
+QN21	3
+MN12	25
+BX10	2
+BX26	5
+QN01	6
+BK78	20
+SI48	2
+BK27	4
+BX99	0
+BK44	3
+BK38	23
+BK88	13
+BK61	21
+BK45	5
+BK63	12
+QN63	2
+QN60	1
+SI37	6
+BK21	5
+SI54	5
+QN62	2
+BK35	28
+MN06	15
+MN11	16
+BX17	17
+BK37	16
+QN51	6
+QN35	13
+QN15	12
+MN27	19
+BK79	13
+BX59	2
+QN42	7
+BK75	22
+BX37	5
+QN07	5
+MN14	11
+QN46	7
+QN61	8
+QN53	5
+MN35	19
+SI08	3
+BK82	24
+MN19	1
+BK83	5
+QN72	5
+QN55	8
+BK72	5
+MN22	7
+QN98	0
+BX28	16
+BX29	14
+QN03	6
+BK42	11
+BK77	18
+MN04	4
+BK19	5
+QN22	8
+BK73	12
+SI36	2
+MN25	12
+MN32	5
+MN20	5
+BK28	9
+QN18	3
+BK33	11
+BK46	1
+MN99	1
+BK41	3
+BX41	8
+BX43	6
+BK69	11
+BK17	10
+BX62	4
+QN12	6
+BK25	3
+BK93	3
+BK91	7
+QN54	12
+QN44	6
+BK23	7
+BX05	5
+BX22	3
+SI32	1
+QN45	5
+QN43	7
+BK95	9
+SI01	8
+BK85	16
+SI99	0
+QN08	7
+BX46	3
+QN71	5
+MN31	12
+BX52	11
+MN13	18
+SI12	4
+QN48	4
+SI07	2
+BK09	1
+QN26	5
+QN99	0
+BK32	15
+QN27	3
+BX35	17
+BX06	13
+SI14	3
+MN34	22
+MN17	3
+MN23	7
+BX40	12
+\.
+
+
+-- Completed on 2016-12-05 23:12:48
+
+--
+-- PostgreSQL database dump complete
+--
+

@@ -1,0 +1,5 @@
+/* View for Rental Data*/
+CREATE VIEW populationarea AS
+(SELECT a.ntacode, (p.population::FLOAT / pmax.maximum::FLOAT ) AS populationfactor
+ FROM areas a, population_data p, (SELECT max(pp.population) AS maximum FROM population_data pp) AS pmax
+ WHERE a.ntacode=p.ntacode);

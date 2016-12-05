@@ -1,0 +1,7 @@
+/* Rental Data View*/
+CREATE VIEW rentalarea AS
+ SELECT a.ntacode, ((SUM(r.value_per_sqft)::FLOAT / COUNT(r.value_per_sqft))::FLOAT / (SELECT MAX(total) FROM rental_data_per_region)) AS Total
+ FROM areas a
+ LEFT JOIN allrentaldata r
+ ON ST_CONTAINS(a.geom, r.coords)
+ GROUP BY a.ntacode;

@@ -1,0 +1,7 @@
+/* View Vor Complaint data */
+CREATE VIEW complaintarea AS
+(SELECT a.ntacode, (COUNT(cd.complaintnr)::FLOAT / (SELECT MAX(total)::FLOAT FROM complaint_data_per_region)) AS Total
+ FROM areas a
+ LEFT JOIN complaint_data cd
+ ON ST_CONTAINS(a.geom, cd.coords)
+ GROUP BY a.ntacode);

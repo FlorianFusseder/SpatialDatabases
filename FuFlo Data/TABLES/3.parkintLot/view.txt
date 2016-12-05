@@ -1,0 +1,7 @@
+/* Parking lot view */ 
+CREATE VIEW parkinglotarea AS
+ SELECT a.ntacode, (SUM(ST_AREA(pl.geom::geography))::FLOAT / (SELECT MAX(total)::FLOAT FROM parking_lots_per_region)) AS Total
+ FROM areas a
+ LEFT JOIN parking_lots pl
+ ON ST_INTERSECTS(a.geom, pl.geom)
+ GROUP BY a.gid, a.ntacode, a.boro_name, a.shape_leng, a.county_fips;

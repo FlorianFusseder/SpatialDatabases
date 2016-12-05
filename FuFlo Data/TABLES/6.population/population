@@ -1,0 +1,251 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 9.6.1
+-- Dumped by pg_dump version 9.6.1
+
+-- Started on 2016-12-05 23:01:30
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+SET row_security = off;
+
+SET search_path = public, pg_catalog;
+
+SET default_tablespace = '';
+
+SET default_with_oids = false;
+
+--
+-- TOC entry 297 (class 1259 OID 19938)
+-- Name: population_data; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE population_data (
+    borough character varying,
+    countycode integer,
+    ntacode character varying,
+    ntaname character varying,
+    population integer
+);
+
+
+ALTER TABLE population_data OWNER TO postgres;
+
+--
+-- TOC entry 4228 (class 0 OID 19938)
+-- Dependencies: 297
+-- Data for Name: population_data; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY population_data (borough, countycode, ntacode, ntaname, population) FROM stdin;
+Bronx	5	BX01	Claremont-Bathgate	31078
+Bronx	5	BX03	Eastchester-Edenwald-Baychester	34517
+Bronx	5	BX05	Bedford Park-Fordham North	54415
+Bronx	5	BX06	Belmont	27378
+Bronx	5	BX07	Bronxdale	35538
+Bronx	5	BX08	West Farms-Bronx River	35011
+Bronx	5	BX09	Soundview-Castle Hill-Clason Point-Harding Park	53686
+Bronx	5	BX10	Pelham Bay-Country Club-City Island	26583
+Bronx	5	BX13	Co-Op City	43752
+Bronx	5	BX14	East Concourse-Concourse Village	62284
+Bronx	5	BX17	East Tremont	43423
+Bronx	5	BX22	North Riverdale-Fieldston-Riverdale	27860
+Bronx	5	BX26	Highbridge	37727
+Bronx	5	BX27	Hunts Point	27204
+Bronx	5	BX28	Van Cortlandt Village	50100
+Bronx	5	BX29	Spuyten Duyvil-Kingsbridge	30161
+Bronx	5	BX30	Kingsbridge Heights	32496
+Bronx	5	BX31	Allerton-Pelham Gardens	28903
+Bronx	5	BX33	Longwood	26196
+Bronx	5	BX34	Melrose South-Mott Haven North	39214
+Bronx	5	BX35	Morrisania-Melrose	37865
+Bronx	5	BX36	University Heights-Morris Heights	54188
+Bronx	5	BX37	Van Nest-Morris Park-Westchester Square	29250
+Bronx	5	BX39	Mott Haven-Port Morris	52413
+Bronx	5	BX40	Fordham South	28262
+Bronx	5	BX41	Mount Hope	51807
+Bronx	5	BX43	Norwood	40494
+Bronx	5	BX44	Williamsbridge-Olinville	61321
+Bronx	5	BX46	Parkchester	29821
+Bronx	5	BX49	Pelham Parkway	30073
+Bronx	5	BX52	Schuylerville-Throgs Neck-Edgewater Park	44167
+Bronx	5	BX55	Soundview-Bruckner	35634
+Bronx	5	BX59	Westchester-Unionport	27248
+Bronx	5	BX62	Woodlawn-Wakefield	42483
+Bronx	5	BX63	West Concourse	39282
+Bronx	5	BX75	Crotona Park East	20277
+Bronx	5	BX98	Rikers Island	11091
+Bronx	5	BX99	park-cemetery-etc-Bronx	1906
+Brooklyn	47	BK09	Brooklyn Heights-Cobble Hill	22887
+Brooklyn	47	BK17	Sheepshead Bay-Gerritsen Beach-Manhattn Bch	64518
+Brooklyn	47	BK19	Brighton Beach	35547
+Brooklyn	47	BK21	Seagate-Coney Island	31965
+Brooklyn	47	BK23	West Brighton	17750
+Brooklyn	47	BK25	Homecrest	44316
+Brooklyn	47	BK26	Gravesend	29436
+Brooklyn	47	BK27	Bath Beach	29931
+Brooklyn	47	BK28	Bensonhurst West	88727
+Brooklyn	47	BK29	Bensonhurst East	62978
+Brooklyn	47	BK30	Dyker Heights	42419
+Brooklyn	47	BK31	Bay Ridge	79371
+Brooklyn	47	BK32	Sunset Park West	54041
+Brooklyn	47	BK33	Carroll Gardens-Columbia Street-Red Hook	38353
+Brooklyn	47	BK34	Sunset Park East	72340
+Brooklyn	47	BK35	Stuyvesant Heights	63504
+Brooklyn	47	BK37	Park Slope-Gowanus	67649
+Brooklyn	47	BK38	DUMBO-Vinegar Hill-Downtown Brklyn-Boerum Hill	34495
+Brooklyn	47	BK40	Windsor Terrace	20988
+Brooklyn	47	BK41	Kensington-Ocean Parkway	36891
+Brooklyn	47	BK42	Flatbush	105804
+Brooklyn	47	BK43	Midwood	52835
+Brooklyn	47	BK44	Madison	38917
+Brooklyn	47	BK45	Georgetown-Marine Park-Bergen Beach-Mill Basin	45231
+Brooklyn	47	BK46	Ocean Parkway South	20299
+Brooklyn	47	BK50	Canarsie	83693
+Brooklyn	47	BK58	Flatlands	64762
+Brooklyn	47	BK60	Prospect Lefferts Gardens-Wingate	67459
+Brooklyn	47	BK61	Crown Heights North	103169
+Brooklyn	47	BK63	Crown Heights South	39670
+Brooklyn	47	BK64	Prospect Heights	19849
+Brooklyn	47	BK68	Fort Greene	26079
+Brooklyn	47	BK69	Clinton Hill	34791
+Brooklyn	47	BK72	Williamsburg	32926
+Brooklyn	47	BK73	North Side-South Side	45774
+Brooklyn	47	BK75	Bedford	70713
+Brooklyn	47	BK76	Greenpoint	34719
+Brooklyn	47	BK77	Bushwick North	57138
+Brooklyn	47	BK78	Bushwick South	72101
+Brooklyn	47	BK79	Ocean Hill	31935
+Brooklyn	47	BK81	Brownsville	58300
+Brooklyn	47	BK82	East New York	91958
+Brooklyn	47	BK83	Cypress Hills-City Line	49223
+Brooklyn	47	BK85	East New York (Pennsylvania Ave)	29343
+Brooklyn	47	BK88	Borough Park	106357
+Brooklyn	47	BK90	East Williamsburg	34158
+Brooklyn	47	BK91	East Flatbush-Farragut	50355
+Brooklyn	47	BK93	Starrett City	13354
+Brooklyn	47	BK95	Erasmus	29938
+Brooklyn	47	BK96	Rugby-Remsen Village	55326
+Brooklyn	47	BK99	park-cemetery-etc-Brooklyn	418
+Manhattan	61	MN01	Marble Hill-Inwood	46746
+Manhattan	61	MN03	Central Harlem North-Polo Grounds	75282
+Manhattan	61	MN04	Hamilton Heights	48520
+Manhattan	61	MN06	Manhattanville	22950
+Manhattan	61	MN09	Morningside Heights	55929
+Manhattan	61	MN11	Central Harlem South	43383
+Manhattan	61	MN12	Upper West Side	132378
+Manhattan	61	MN13	Hudson Yards-Chelsea-Flat Iron-Union Square	70150
+Manhattan	61	MN14	Lincoln Square	61489
+Manhattan	61	MN15	Clinton	45884
+Manhattan	61	MN17	Midtown-Midtown South	28630
+Manhattan	61	MN19	Turtle Bay-East Midtown	51231
+Manhattan	61	MN20	Murray Hill-Kips Bay	50742
+Manhattan	61	MN21	Gramercy	27988
+Manhattan	61	MN22	East Village	44136
+Manhattan	61	MN23	West Village	66880
+Manhattan	61	MN24	SoHo-TriBeCa-Civic Center-Little Italy	42742
+Manhattan	61	MN25	Battery Park City-Lower Manhattan	39699
+Manhattan	61	MN27	Chinatown	47844
+Manhattan	61	MN28	Lower East Side	72957
+Manhattan	61	MN31	Lenox Hill-Roosevelt Island	80771
+Manhattan	61	MN32	Yorkville	77942
+Manhattan	61	MN33	East Harlem South	57902
+Manhattan	61	MN34	East Harlem North	58019
+Manhattan	61	MN35	Washington Heights North	67136
+Manhattan	61	MN36	Washington Heights South	84438
+Manhattan	61	MN40	Upper East Side-Carnegie Hill	61207
+Manhattan	61	MN50	Stuyvesant Town-Cooper Village	21049
+Manhattan	61	MN99	park-cemetery-etc-Manhattan	1849
+Queens	81	QN01	South Jamaica	38894
+Queens	81	QN02	Springfield Gardens North	25409
+Queens	81	QN03	Springfield Gardens South-Brookville	20132
+Queens	81	QN05	Rosedale	25063
+Queens	81	QN06	Jamaica Estates-Holliswood	25480
+Queens	81	QN07	Hollis	20269
+Queens	81	QN08	St. Albans	48593
+Queens	81	QN10	Breezy Point-Belle Harbor-Rockwy Prk-Broad Chnl	28018
+Queens	81	QN12	Hammels-Arverne-Edgemere	36885
+Queens	81	QN15	Far Rockaway-Bayswater	50058
+Queens	81	QN17	Forest Hills	83728
+Queens	81	QN18	Rego Park	28260
+Queens	81	QN19	Glendale	32496
+Queens	81	QN20	Ridgewood	69317
+Queens	81	QN21	Middle Village	37929
+Queens	81	QN22	Flushing	72008
+Queens	81	QN23	College Point	24275
+Queens	81	QN25	Corona	57658
+Queens	81	QN26	North Corona	52037
+Queens	81	QN27	East Elmhurst	23150
+Queens	81	QN28	Jackson Heights	108152
+Queens	81	QN29	Elmhurst	88427
+Queens	81	QN30	Maspeth	30516
+Queens	81	QN31	Hunters Point-Sunnyside-West Maspeth	63271
+Queens	81	QN33	Cambria Heights	18677
+Queens	81	QN34	Queens Village	52504
+Queens	81	QN35	Briarwood-Jamaica Hills	39138
+Queens	81	QN37	Kew Gardens Hills	37479
+Queens	81	QN38	Pomonok-Flushing Heights-Hillcrest	34034
+Queens	81	QN41	Fresh Meadows-Utopia	17812
+Queens	81	QN42	Oakland Gardens	28237
+Queens	81	QN43	Bellerose	25287
+Queens	81	QN44	Glen Oaks-Floral Park-New Hyde Park	22571
+Queens	81	QN45	Douglas Manor-Douglaston-Little Neck	24739
+Queens	81	QN46	Bayside-Bayside Hills	43808
+Queens	81	QN47	Ft. Totten-Bay Terrace-Clearview	21751
+Queens	81	QN48	Auburndale	19996
+Queens	81	QN49	Whitestone	30773
+Queens	81	QN50	Elmhurst-Maspeth	25521
+Queens	81	QN51	Murray Hill	51739
+Queens	81	QN52	East Flushing	26982
+Queens	81	QN53	Woodhaven	56674
+Queens	81	QN54	Richmond Hill	62982
+Queens	81	QN55	South Ozone Park	75878
+Queens	81	QN56	Ozone Park	21376
+Queens	81	QN57	Lindenwood-Howard Beach	26148
+Queens	81	QN60	Kew Gardens	23278
+Queens	81	QN61	Jamaica	53751
+Queens	81	QN62	Queensboro Hill	20800
+Queens	81	QN63	Woodside	45099
+Queens	81	QN66	Laurelton	24453
+Queens	81	QN68	Queensbridge-Ravenswood-Long Island City	20030
+Queens	81	QN70	Astoria	78793
+Queens	81	QN71	Old Astoria	27814
+Queens	81	QN72	Steinway	47534
+Queens	81	QN76	Baisley Park	34603
+Queens	81	QN98	Airport	0
+Queens	81	QN99	park-cemetery-etc-Queens	436
+Staten Island	85	SI01	Annadale-Huguenot-Prince's Bay-Eltingville	27770
+Staten Island	85	SI05	New Springville-Bloomfield-Travis	39597
+Staten Island	85	SI07	Westerleigh	24102
+Staten Island	85	SI08	Grymes Hill-Clifton-Fox Hills	22460
+Staten Island	85	SI11	Charleston-Richmond Valley-Tottenville	23313
+Staten Island	85	SI12	Mariner's Harbor-Arlington-Port Ivory-Graniteville	31474
+Staten Island	85	SI14	Grasmere-Arrochar-Ft. Wadsworth	16079
+Staten Island	85	SI22	West New Brighton-New Brighton-St. George	33551
+Staten Island	85	SI24	Todt Hill-Emersn Hill-Heartland Villg-Lighthse Hill	30714
+Staten Island	85	SI25	Oakwood-Oakwood Beach	22049
+Staten Island	85	SI28	Port Richmond	20191
+Staten Island	85	SI32	Rossville-Woodrow	20763
+Staten Island	85	SI35	New Brighton-Silver Lake	17525
+Staten Island	85	SI36	Old Town-Dongan Hills-South Beach	24835
+Staten Island	85	SI37	Stapleton-Rosebank	26453
+Staten Island	85	SI45	New Dorp-Midland Beach	21896
+Staten Island	85	SI48	Arden Heights	25238
+Staten Island	85	SI54	Great Kills	40720
+Staten Island	85	SI99	park-cemetery-etc-Staten Island	0
+\.
+
+
+-- Completed on 2016-12-05 23:01:30
+
+--
+-- PostgreSQL database dump complete
+--
+
