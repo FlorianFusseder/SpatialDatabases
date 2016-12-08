@@ -39,6 +39,17 @@ var minValuation;
 // Hold user input values
 var areaImportance = 0;
 var centerImportance = 0;
+var universityImportance = 0;
+var parkingImportance = 0;
+var schoolImportance = 0;
+var rentalImportance = 0;
+var populationImportance = 0;
+var complaintImportance = 0;
+var playgroundImportance = 0;
+var parkImportance = 0;
+var soccerfieldImportance = 0;
+var restaurantImportance = 0;
+var subwayImportance = 0;
 // Hold context between html ui elements and map elements
 var cardsForFeatures;
 
@@ -113,7 +124,18 @@ function weightGeoJson(geoJson) {
 
     feature.valuation += areaValuation(feature);
     feature.valuation += centerDistanceValuation(feature);
-    // TODO: Add proper valuation functions for different feature aspects
+    feature.valuation += universityValuation(feature);
+    feature.valuation += parkingValuation(feature);
+    feature.valuation += schoolValuation(feature);
+    feature.valuation += rentalValuation(feature);
+    feature.valuation += populationValuation(feature);
+    feature.valuation += complaintValuation(feature);
+    feature.valuation += parkingValuation(feature);
+    feature.valuation += parkValuation(feature);
+    feature.valuation += playgroundValuation(feature);
+    feature.valuation += restaurantValuation(feature);
+    feature.valuation += soccerfieldsValuation(feature);
+    feature.valuation += subwayValuation(feature);
 
     // Keep minimum and maximum, useful to get good colors for the map
     if (feature.valuation > maxValuation) {
@@ -136,11 +158,44 @@ function weightGeoJson(geoJson) {
 // Values a given feature by using an algorithm.
 // Returns positive or negative values based on how good this given feature is.
 function areaValuation(feature) {
-  return feature.properties.size_rating * areaImportance;
+  return feature.properties.size_rating * areaImportance || 0;
 }
 function centerDistanceValuation(feature) {
   // Its better to be close to the center, so value it negative
-  return feature.properties.center_rating * centerImportance * -1;
+  return feature.properties.center_rating * centerImportance * -1 || 0;
+}
+function universityValuation(feature) {
+  return feature.properties.university_rating * universityImportance || 0;
+}
+function parkingValuation(feature) {
+  return feature.properties.parking_rating * parkingImportance || 0;
+}
+function schoolValuation(feature) {
+  return feature.properties.school_rating * schoolImportance || 0;
+}
+function rentalValuation(feature) {
+  return feature.properties.rental_rating * rentalImportance || 0;
+}
+function populationValuation(feature) {
+  return feature.properties.population_rating * populationImportance || 0;
+}
+function complaintValuation(feature) {
+  return feature.properties.complaint_rating * complaintImportance || 0;
+}
+function parkValuation(feature) {
+  return feature.properties.park_ratings * parkImportance || 0;
+}
+function playgroundValuation(feature) {
+  return feature.properties.playground_ratings * playgroundImportance || 0;
+}
+function restaurantValuation(feature) {
+  return feature.properties.restaurant_rating * restaurantImportance || 0;
+}
+function soccerfieldsValuation(feature) {
+  return feature.properties.soccerfields_rating * soccerfieldImportance || 0;
+}
+function subwayValuation(feature) {
+  return feature.properties.subway_rating * subwayImportance || 0;
 }
 
 // TODO: Add proper valuation functions for different feature aspects
@@ -170,6 +225,7 @@ $(document).ready(function () {
     }
   });
 
+  // Sliders
   $('#area-range').range({
     min: -5,
     max: 5,
@@ -184,6 +240,84 @@ $(document).ready(function () {
     step: 1,
     onChange: function (val) { centerImportance = val; updateUi(); },
   });
+  $('#university-range').range({
+    min: -5,
+    max: 5,
+    start: 0,
+    step: 1,
+    onChange: function (val) { universityImportance = val; updateUi(); },
+  });
+  $('#parking-range').range({
+    min: -5,
+    max: 5,
+    start: 0,
+    step: 1,
+    onChange: function (val) { parkingImportance = val; updateUi(); },
+  });
+  $('#school-range').range({
+    min: -5,
+    max: 5,
+    start: 0,
+    step: 1,
+    onChange: function (val) { schoolImportance = val; updateUi(); },
+  });
+  $('#rental-range').range({
+    min: -5,
+    max: 5,
+    start: 0,
+    step: 1,
+    onChange: function (val) { rentalImportance = val; updateUi(); },
+  });
+  $('#population-range').range({
+    min: -5,
+    max: 5,
+    start: 0,
+    step: 1,
+    onChange: function (val) { populationImportance = val; updateUi(); },
+  });
+  $('#complaint-range').range({
+    min: -5,
+    max: 5,
+    start: 0,
+    step: 1,
+    onChange: function (val) { complaintImportance = val; updateUi(); },
+  });
+  $('#playground-range').range({
+    min: -5,
+    max: 5,
+    start: 0,
+    step: 1,
+    onChange: function (val) { playgroundImportance = val; updateUi(); },
+  });
+  $('#park-range').range({
+    min: -5,
+    max: 5,
+    start: 0,
+    step: 1,
+    onChange: function (val) { parkImportance = val; updateUi(); },
+  });
+  $('#soccerfield-range').range({
+    min: -5,
+    max: 5,
+    start: 0,
+    step: 1,
+    onChange: function (val) { soccerfieldImportance = val; updateUi(); },
+  });
+  $('#restaurant-range').range({
+    min: -5,
+    max: 5,
+    start: 0,
+    step: 1,
+    onChange: function (val) { restaurantImportance = val; updateUi(); },
+  });
+  $('#subway-range').range({
+    min: -5,
+    max: 5,
+    start: 0,
+    step: 1,
+    onChange: function (val) { subwayImportance = val; updateUi(); },
+  });
+
 
   $('.ui.checkbox').checkbox();
 
@@ -220,6 +354,17 @@ $(document).ready(function () {
 function updateUi() {
   $('#are-range-label').html('Area (' + areaImportance + ')');
   $('#center-range-label').html('Center (' + centerImportance + ')');
+  $('#university-range-label').html('University (' + universityImportance + ')');
+  $('#parking-range-label').html('Parking (' + parkingImportance + ')');
+  $('#school-range-label').html('School (' + schoolImportance + ')');
+  $('#rental-range-label').html('Rental (' + rentalImportance + ')');
+  $('#population-range-label').html('Population (' + populationImportance + ')');
+  $('#complaint-range-label').html('Complaint (' + complaintImportance + ')');
+  $('#playground-range-label').html('Playground (' + playgroundImportance + ')');
+  $('#park-range-label').html('Park (' + parkImportance + ')');
+  $('#soccerfield-range-label').html('Soccerfield (' + soccerfieldImportance + ')');
+  $('#restaurant-range-label').html('Restaurant (' + restaurantImportance + ')');
+  $('#subway-range-label').html('Subway (' + subwayImportance + ')');
 
   if (currentData) {
     weightGeoJson(currentData);
