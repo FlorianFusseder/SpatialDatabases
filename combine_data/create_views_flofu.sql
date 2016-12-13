@@ -13,12 +13,11 @@ SELECT * FROM colleguesuniversityarea;
 
 /** Parking Lot **/
 CREATE VIEW parkinglotarea AS
- SELECT a.ntacode, (SUM(ST_AREA(pl.geom::geography))::FLOAT / (SELECT MAX(total)::FLOAT FROM parking_lots_per_region)) AS Total
+ SELECT a.ntacode, (pl.total::FLOAT / (SELECT MAX(total)::FLOAT FROM parking_lots_per_region)) AS Total
  FROM areas a
- LEFT JOIN parking_lots pl
- ON ST_INTERSECTS(a.geom, pl.geom)
- GROUP BY a.gid, a.ntacode, a.boro_name, a.shape_leng, a.county_fip;
-
+ LEFT JOIN parking_lots_per_region pl
+ ON (a.ntacode = pl.ntacode);
+ 
 SELECT * FROM parkinglotarea;
 
 /** Public Schools **/
@@ -43,7 +42,7 @@ SELECT * FROM rentalarea;
 
 /** Population **/
 CREATE VIEW populationarea AS
-(SELECT a.ntacode, (p.population::FLOAT / pmax.maximum::FLOAT ) AS populationfactor
+(SELECT a.ntacode, ((p.population::FLOAT / ST_AREA(a.geom::geography)::FLOAT) / (pmax.maximum::FLOAT / ST_AREA(a.geom::geography)::FLOAT)) AS populationfactor
  FROM areas a, population_data p, (SELECT max(pp.population) AS maximum FROM population_data pp) AS pmax
  WHERE a.ntacode=p.ntacode);
 
