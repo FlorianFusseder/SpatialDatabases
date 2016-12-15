@@ -6,10 +6,8 @@ CREATE VIEW colleguesuniversityarea AS
 (SELECT a.ntacode, (COUNT(cu.geom)::FLOAT / (SELECT MAX(total)::FLOAT from colleguesuniversity_per_region)) AS Total
  FROM areas a
  LEFT JOIN colleges_and_universitys cu
- ON ST_CONTAINS(a.geom, cu.geom)
- GROUP BY a.ntacode);   
-
-SELECT * FROM colleguesuniversityarea; 
+ ON ST_DWITHIN(a.geom::geography, cu.geom, 2500)
+ GROUP BY a.ntacode);
 
 /** Parking Lot **/
 CREATE VIEW parkinglotarea AS

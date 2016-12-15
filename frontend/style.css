@@ -14,6 +14,7 @@
 .fill-parent {
     height: 100%;
     width: 100%;
+    overflow: scroll;
 }
 
 .new-york-background {
@@ -66,4 +67,19 @@
     bottom: 0;
     left: 0;
     right: 0;
+}
+
+
+/* Source: https://gist.github.com/comp615/2288108 */
+.leaflet-div-icon {
+    background: transparent;
+    border: none;
+}
+
+.leaflet-marker-icon .number{
+    position: relative;
+    top: -44px;
+    font-size: 12px;
+    width: 25px;
+    text-align: center;
 }

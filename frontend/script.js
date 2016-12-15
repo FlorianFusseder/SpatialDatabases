@@ -29,39 +29,9 @@ var dataSource =  './geoserver/spt-project/ows' +
 // Main Programm
 ////////////////////////////////////
 var map = initializeMap();
+
 var selection_map = initializeSelectionMap();
-
-// TODO: Refactor
 var geocoder = L.mapbox.geocoder('mapbox.places');
-
-$('.ui.search').api({
-  mockResponseAsync: function(settings, callback) {
-    const query = settings.urlData.query;
-    console.log(query);
-
-    if (query) {
-      geocoder.query({query: query}, function(error, data) {
-        if (error) {
-          callback([]);
-        } else {
-          console.log(data.results);
-          callback(data.results);
-        }
-      });
-    } else {
-      callback([]);
-    }
-  },
-}).search({
-  debug: true,
-  verbose: true,
-  fields: {
-    results: 'features',
-    title: 'place_name',
-  },
-});
-
-// TODO: Refactor
 
 // Holds the current GeoJSON data displayed on the map
 var currentData;
@@ -101,6 +71,10 @@ $.get(dataSource)
     .fail(function () {
       console.log('Error loading geoJSON file!');
     });
+
+// Init Route Input UI
+var selectedPlaces = [];
+initRouteInput();
 
 
 ////////////////////////////////////
@@ -501,4 +475,161 @@ function onEachFeature(feature, layer) {
     mouseout: function (event) { resetHighlight(feature); },
     click: function (event) { zoomToFeature(feature); },
   });
+}
+
+
+////////////////////////////////////
+// Second Question Pane - Users Important Places
+////////////////////////////////////
+function initRouteInput() {
+  // Source: https://gist.github.com/comp615/2288108
+  // Displays a marker with a number in it
+  L.NumberedDivIcon = L.Icon.extend({
+    options: {
+      iconUrl: 'http://www.charliecroom.com/marker_hole.png',
+      number: '',
+      shadowUrl: null,
+      iconSize: new L.Point(25, 41),
+      iconAnchor: new L.Point(13, 41),
+      popupAnchor: new L.Point(0, -33),
+      /*
+       iconAnchor: (Point)
+       popupAnchor: (Point)
+       */
+      className: 'leaflet-div-icon'
+    },
+
+    createIcon: function () {
+      var div = document.createElement('div');
+      var img = this._createImg(this.options['iconUrl']);
+      var numdiv = document.createElement('div');
+      numdiv.setAttribute ( "class", "number" );
+      numdiv.innerHTML = this.options['number'] || '';
+      div.appendChild ( img );
+      div.appendChild ( numdiv );
+      this._setIconStyles(div, 'icon');
+      return div;
+    },
+
+    //you could change this to add a shadow like in the normal marker if you really wanted
+    createShadow: function () {
+      return null;
+    }
+  });
+
+  // The Html used for a single input field to seach places
+  var nodeHtml =
+      '<div class="two fields">' +
+        '<div class="field">' +
+          '<div class="ui search">' +
+            '<div class="ui icon input">' +
+              '<input class="prompt" type="text" placeholder="Address">' +
+              '<i class="search icon"></i>' +
+            '</div>' +
+            '<div class="results"></div>' +
+          '</div>' +
+        '</div>' +
+
+        '<div class="field">' +
+          '<button class="ui negative button">Remove</button>' +
+        '</div>' +
+      '</div> ';
+  var $route_inputs = $('#route-inputs');
+
+  // Called when the user adds a new place.
+  // Adds a new input node an configures its events.
+  function addPlace() {
+    var node = $(nodeHtml);
+
+    // Allow Removal of Places
+    // Be sure to update the data, ui and the markers on teh map
+    node.find('.ui.negative.button').click(function() {
+      var index = findIndexOfNode(node);
+
+      if (selectedPlaces[index].marker != null) {
+        selection_map.removeLayer(selectedPlaces[index].marker);
+      }
+      selectedPlaces.splice(index, 1);
+      node.remove();
+      updateIconIndices();
+    });
+
+    // Configure The Search function of the textbox
+    node.api({
+      mockResponseAsync: function(settings, callback) {
+        const query = settings.urlData.query;
+
+        if (query) {
+          var queryOptions = {
+            query: query,
+            proximity: mapViewport.center,
+          };
+          geocoder.query(queryOptions, function(error, data) {
+            if (error) {
+              callback([]);
+            } else {
+              callback(data.results);
+            }
+          });
+        } else {
+          callback([]);
+        }
+      },
+    }).search({
+      fields: {
+        results: 'features',
+        title: 'place_name',
+      },
+      onSelect: function(result, response) {
+        var index = findIndexOfNode(node);
+
+        var targetPosition = result.geometry.coordinates;
+        selectedPlaces[index].data = result;
+        if (selectedPlaces[index].marker) {
+          selectedPlaces[index].marker.setLatLng([targetPosition[1], targetPosition[0]]);
+        } else {
+          selectedPlaces[index].marker =
+              L.marker([targetPosition[1], targetPosition[0]], {
+                icon:	new L.NumberedDivIcon({number: '' + (index + 1)}),
+              }).addTo(selection_map);
+        }
+      },
+    });
+
+    // Add our new search box to the ui
+    node.appendTo($route_inputs);
+
+    // Insert our new place to the data array
+    selectedPlaces.push({ node: node, data: null, marker: null });
+  }
+
+  // Updates the numbers displayed in the Markers on the map.
+  // Needed when deleting Places, as this changes the order/array.
+  function updateIconIndices() {
+    for(var index = 0; index < selectedPlaces.length; index++) {
+      if (selectedPlaces[index].marker != null) {
+        selectedPlaces[index].marker.setIcon(new L.NumberedDivIcon({number: '' + (index + 1)}));
+      }
+    }
+  }
+
+  // Search for the position of a node in the 'selectedPlaces'.
+  // This is needed as the array changes indices when removing places.
+  function findIndexOfNode(node) {
+    var index;
+
+    selectedPlaces.forEach(function(element, position) {
+      if (element.node == node) {
+        index = position;
+      }
+    });
+
+    return index;
+  }
+
+  // Add an click listener to the 'Add Place' Button
+  $('#add-place').click(function() {
+    addPlace();
+  });
+
 }
