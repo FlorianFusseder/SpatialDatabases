@@ -21,8 +21,9 @@
     <link href='./style.css' rel='stylesheet'/>
   </head>
   <body>
-    <!-- Main Content -->
+    <!-- Main Content (Map with side panels) -->
     <div class="fullscreen flex-container">
+      <!-- Left Nav: Contains selection Sliders -->
       <div id="left-nav">
         <i class="top-right big search icon" id="toggle-left-nav"></i>
 
@@ -83,10 +84,12 @@
         </div>
       </div>
 
+      <!-- Main map area -->
       <div id="map">
 
       </div>
 
+      <!-- Right Nav: Contains search results -->
       <div id="right-nav">
         <i class="top-left big tasks icon" id="toggle-right-nav"></i>
 
@@ -98,14 +101,18 @@
       </div>
     </div>
 
+
+    <!-- Initial Selection Screen -->
     <div class="fullscreen new-york-background" style="z-index: 99999;" id="input-view">
       <div class="ui container light-padding fill-parent">
         <div class="ui segment fill-parent center aligned ">
+          <!-- Header Area -->
           <h1 class="ui header">
             Move to New York
           </h1>
-
           <h2>Find your perfect spot in New York City</h2>
+
+          <!-- Step Indicators -->
           <div class="ui three ordered steps">
             <div class="active step" id="first-step-indicator">
               <div class="content">
@@ -126,6 +133,8 @@
               </div>
             </div>
           </div>
+
+          <!-- First Step: General Questions -->
           <div class="ui segment left aligned" id="first-step">
             <div class="ui form">
               <div class="inline field">
@@ -160,19 +169,61 @@
             </div>
           </div>
 
+          <!-- Second Step: Ask for a typical day (places that the person visits often) -->
           <div class="ui segment left aligned" id="second-step" hidden>
-            <div class="ui form">
-              <div class="inline field">
-                <div class="ui checkbox">
-                  <input type="checkbox" tabindex="0" class="hidden" name="more-details">
-                  <label>Ask more details, e.g. important locations.</label>
+            <h3>Details</h3>
+            <div class="ui grid">
+              <div class="eight wide column">
+                <p>
+                  Let us know what places you usually visit during a day.
+                  This will help us to search a place that is not too far from your daily visited places.
+                </p>
+                <div class="ui form">
+                  <div class="field">
+                    <label>You start your day home.</label>
+                    <input type="text" value="Home" disabled=""/>
+                  </div>
+
+                  <div class="field">
+                    <label>Then you visit these places.</label>
+                    <div class="two fields">
+                      <div class="field">
+                        <div class="ui search">
+                          <div class="ui icon input">
+                            <input class="prompt" type="text" placeholder="Address">
+                            <i class="search icon"></i>
+                          </div>
+                          <div class="results"></div>
+                        </div>
+                      </div>
+
+                      <div class="field">
+                        <button class="ui negative button" type="submit">Remove</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="field">
+                    <button class="ui green button" type="submit">Add Place</button>
+                  </div>
+
+                  <div class="field">
+                    <label>After a long day you head back home.</label>
+                    <input type="text" value="Home" disabled=""/>
+                  </div>
+
+                  <div class="ui submit button" id="finish-second-step">Next Step</div>
+
                 </div>
               </div>
-
-              <div class="ui submit button" id="finish-second-step">Next Step</div>
+              <div class="eight wide column">
+                <div id="selection-map">
+                </div>
+              </div>
             </div>
           </div>
 
+          <!-- Third Step: Loading Indicator -->
           <div class="ui segment left aligned" id="third-step" style="padding: 100px;" hidden>
             <div class="ui active dimmer">
               <div class="ui text loader">Searching...</div>
@@ -182,7 +233,7 @@
       </div>
     </div>
 
-    <!-- Run our Programm -->
+    <!-- Run our programme -->
     <script src="./script.js"></script>
   </body>
 </html>

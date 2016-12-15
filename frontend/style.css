@@ -55,6 +55,11 @@
     flex-grow: 1;
 }
 
+#selection-map {
+    height: 300px;
+    width: 100%;
+}
+
 .fullscreen {
     position: absolute;
     top: 0;

@@ -29,6 +29,39 @@ var dataSource =  './geoserver/spt-project/ows' +
 // Main Programm
 ////////////////////////////////////
 var map = initializeMap();
+var selection_map = initializeSelectionMap();
+
+// TODO: Refactor
+var geocoder = L.mapbox.geocoder('mapbox.places');
+
+$('.ui.search').api({
+  mockResponseAsync: function(settings, callback) {
+    const query = settings.urlData.query;
+    console.log(query);
+
+    if (query) {
+      geocoder.query({query: query}, function(error, data) {
+        if (error) {
+          callback([]);
+        } else {
+          console.log(data.results);
+          callback(data.results);
+        }
+      });
+    } else {
+      callback([]);
+    }
+  },
+}).search({
+  debug: true,
+  verbose: true,
+  fields: {
+    results: 'features',
+    title: 'place_name',
+  },
+});
+
+// TODO: Refactor
 
 // Holds the current GeoJSON data displayed on the map
 var currentData;
@@ -81,6 +114,10 @@ function initializeMap() {
     minZoom: mapViewport.minZoomLevel,
     maxZoom: mapViewport.maxZoomLevel,
   }).setView(mapViewport.center, mapViewport.initialZoomLevel);
+};
+function initializeSelectionMap() {
+  return L.mapbox.map('selection-map', 'mapbox.light')
+            .setView(mapViewport.center, mapViewport.initialZoomLevel);
 };
 
 function getColor(valuation) {
@@ -327,6 +364,9 @@ $(document).ready(function () {
     $('#second-step-indicator').toggleClass('active');
     $('#first-step').hide();
     $('#second-step').show();
+
+    // Needed to correctly load the map
+    selection_map.invalidateSize();
   });
 
   $('#finish-second-step').click(function () {
