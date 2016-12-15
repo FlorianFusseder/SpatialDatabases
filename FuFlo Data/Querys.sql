@@ -57,7 +57,7 @@ SELECT * FROM population_data;
 
 /* View for Rental Data*/
 CREATE VIEW populationarea AS
-(SELECT a.ntacode, (p.population::FLOAT / pmax.maximum::FLOAT ) AS populationfactor
+(SELECT a.ntacode, ((p.population::FLOAT / ST_AREA(a.geom::geography)::FLOAT) / (pmax.maximum::FLOAT / ST_AREA(a.geom::geography)::FLOAT)) AS populationfactor
  FROM areas a, population_data p, (SELECT max(pp.population) AS maximum FROM population_data pp) AS pmax
  WHERE a.ntacode=p.ntacode);
  
@@ -350,12 +350,12 @@ SELECT * FROM colleges_and_universitys;
  GROUP BY a.ntacode);
  
 /* Collegue View */
-CREATE VIEW colleguesuniversityarea AS
+CREATE VIEW colleguesuniversityareabuffer AS
 (SELECT a.ntacode, (COUNT(cu.geom)::FLOAT / (SELECT MAX(total)::FLOAT from colleguesuniversity_per_region)) AS Total
  FROM areas a
  LEFT JOIN colleges_and_universitys cu
- ON ST_CONTAINS(a.geom, cu.geom)
- GROUP BY a.ntacode);                  
+ ON ST_DWITHIN(a.geom::geography, cu.geom, 200)
+ GROUP BY a.ntacode);
 
 /* parkinglot  */
 /*_________________________________________________________________________________________________________*/
@@ -364,20 +364,19 @@ SELECT * FROM parking_lots;
 
 /* Parking lot area per region */
 CREATE TABLE parking_lots_per_region AS
- SELECT a.ntacode, SUM(ST_AREA(pl.geom::geography)) AS Total
+ SELECT a.ntacode, (SUM(ST_AREA(pl.geom::geography))::FLOAT / ST_AREA(a.geom::geography)) AS Total
  FROM areas a
  LEFT JOIN parking_lots pl
  ON ST_INTERSECTS(a.geom, pl.geom)
- GROUP BY a.ntacode;
+ GROUP BY a.ntacode, a.geom;
  
 /* Parking lot view */ 
 CREATE VIEW parkinglotarea AS
- SELECT a.ntacode, (SUM(ST_AREA(pl.geom::geography))::FLOAT / (SELECT MAX(total)::FLOAT FROM parking_lots_per_region)) AS Total
+ SELECT a.ntacode, (pl.total::FLOAT / (SELECT MAX(total)::FLOAT FROM parking_lots_per_region)) AS Total
  FROM areas a
- LEFT JOIN parking_lots pl
- ON ST_INTERSECTS(a.geom, pl.geom)
- GROUP BY a.gid, a.ntacode, a.boro_name, a.shape_leng, a.county_fips;
-
+ LEFT JOIN parking_lots_per_region pl
+ ON (a.ntacode = pl.ntacode);
+ 
 /* public schoolpoints */
 /*_________________________________________________________________________________________________________*/
 
