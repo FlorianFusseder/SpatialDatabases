@@ -30,6 +30,10 @@
         <div class="nav-content">
           <h2>Refine Search</h2>
           <div class="ui vertical segment">
+            <label id="personal-distance-range-label">Personal Distance</label>
+            <div class="ui range" id="personal-distance-range"></div>
+          </div>
+          <div class="ui vertical segment">
             <label id="are-range-label">Area</label>
             <div class="ui range" id="area-range"></div>
           </div>
@@ -104,7 +108,7 @@
 
     <!-- Initial Selection Screen -->
     <div class="fullscreen new-york-background" style="z-index: 99999;" id="input-view">
-      <div class="ui container light-padding fill-parent">
+      <div class="ui container light-padding fill-parent" style="overflow: hidden;">
         <div class="ui segment fill-parent center aligned ">
           <!-- Header Area -->
           <h1 class="ui header">

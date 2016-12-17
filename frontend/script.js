@@ -15,6 +15,19 @@ var mapViewport = {
   minZoomLevel: 10,
 };
 
+// The maximum amount of places the user can add to his daily route.
+// Values under 25 help to make the search fast.
+var maxNumberOfUserPlaces = 10;
+
+// The maximum amount of places to query distances at once from mapbox
+var maxNumberOfPlacesInDistanceQuery = 100;
+
+// Change 'walking' to cycling of driving if needed
+// NOTE: I had to ask the support to activate the distances api for my access token,
+//        as it is still in preview. You will have to do the same if you use your account.
+var distanceApiUrl = 'https://api.mapbox.com/distances/v1/mapbox/walking?access_token='
+                        + L.mapbox.accessToken;
+
 // Our GeoServer data source
 var dataSource =  './geoserver/spt-project/ows' +
                   '?service=WFS' +
@@ -53,6 +66,7 @@ var parkImportance = 0;
 var soccerfieldImportance = 0;
 var restaurantImportance = 0;
 var subwayImportance = 0;
+var personalDistanceImportance = 5;
 // Hold context between html ui elements and map elements
 var cardsForFeatures;
 
@@ -147,6 +161,7 @@ function weightGeoJson(geoJson) {
     feature.valuation += restaurantValuation(feature);
     feature.valuation += soccerfieldsValuation(feature);
     feature.valuation += subwayValuation(feature);
+    feature.valuation += personalDistanceValuation(feature);
 
     // Keep minimum and maximum, useful to get good colors for the map
     if (feature.valuation > maxValuation) {
@@ -207,6 +222,9 @@ function soccerfieldsValuation(feature) {
 }
 function subwayValuation(feature) {
   return feature.properties.subway_rating * subwayImportance || 0;
+}
+function personalDistanceValuation(feature) {
+  return feature.properties.personalDistance * personalDistanceImportance * -1 || 0;
 }
 
 // TODO: Add proper valuation functions for different feature aspects
@@ -328,6 +346,13 @@ $(document).ready(function () {
     step: 1,
     onChange: function (val) { subwayImportance = val; updateUi(); },
   });
+  $('#personal-distance-range').range({
+    min: -5,
+    max: 5,
+    start: 5,
+    step: 1,
+    onChange: function (val) { personalDistanceImportance = val; updateUi(); },
+  });
 
 
   $('.ui.checkbox').checkbox();
@@ -350,20 +375,102 @@ $(document).ready(function () {
     $('#second-step').hide();
     $('#third-step').show();
 
-    // TODO: Pre set the weighting sliders
-    // TODO: query for points that the user is interested in
-
-    if ($('#has-children').prop('checked') == true) {
-      $('#area-range').range('set value', 1);
-    } else {
-      $('#area-range').range('set value', -1);
-    }
-
-    setTimeout(function () {
-      $('#input-view').fadeOut();
-    }, 2000);
+    userQuestionDialogFinished();
   });
 });
+
+// Called when the user finished the second step of the initial questions.
+// Use this to predefine the slider values and to query additional data.
+function userQuestionDialogFinished() {
+  // TODO: Pre set the weighting sliders
+  // TODO: query for points that the user is interested in
+  if ($('#has-children').prop('checked') == true) {
+    $('#area-range').range('set value', 1);
+  } else {
+    $('#area-range').range('set value', -1);
+  }
+  // Apply our preselection to the data
+  updateUi();
+
+  // Filter/Transform selected places to only contain valid coordinate pairs of the selection
+  selectedPlaces = selectedPlaces.filter(function(element) {
+    return !!element.data;
+  });
+  selectedPlaces = selectedPlaces.map(function(element) {
+    return element.data.geometry.coordinates;
+  });
+
+  // Only query the server for distances if the user entered his daily route
+  if (selectedPlaces.length > 0) {
+    var regionCenters = currentData.features.map(function(feature) {
+      return feature.properties.center.coordinates;
+    });
+
+    // Keep track of the maximum distance to normalise the data
+    var maxDistance = 1;
+
+    // Wee need to batch request the distances.
+    // Mapbox only allows 100 places per request.
+    var regionsPerRequest = (maxNumberOfPlacesInDistanceQuery - maxNumberOfUserPlaces);
+    for (var i = 0; i < regionCenters.length; i += regionsPerRequest) {
+
+      // We always request in the following format:
+      // fixed number of region centers concated with all of the users places.
+      // This allows us to read all needed times out of the response.
+      var requestData = {
+        'coordinates': regionCenters.slice(i, i + regionsPerRequest).concat(selectedPlaces),
+      };
+
+      // Calculate all of the distances using mapbox
+      $.ajax({
+        url: distanceApiUrl,
+        data: JSON.stringify(requestData),
+        contentType: 'application/json; charset=utf-8',
+        dataType: 'json',
+        type: 'POST',
+        async: false, // TODO: Add async code with promises. For now this is easier.
+        success: function (data, status, xhr) {
+          // The Result Data will contain an matrix with distances
+          // from each point to each other point.
+          var durations = data.durations;
+
+          // First calculate the distances from the first user place to the last user place.
+          // This part of the route will always stay the same for each of the regions.
+          var fixedRouteDistance = 0;
+          for (var j = durations.length - selectedPlaces.length; j < durations.length - 1; j++) {
+            fixedRouteDistance += durations[j][j + 1];
+          }
+
+          // Now calculate the total distance to each of the centers:
+          // center to first place distance + fixedRouteDistance + last place to center distance
+          for (var k = 0; k < durations.length - selectedPlaces.length; k++) {
+            var centerToFirstPlace = durations[k][durations.length - selectedPlaces.length];
+            var lastPlaceToCenter = durations[durations.length - 1][k];
+
+            // Calculate total and save it as a property
+            var total = centerToFirstPlace + fixedRouteDistance + lastPlaceToCenter;
+            currentData.features[i + k].properties.personalDistance = total;
+
+            if (total > maxDistance) {
+              maxDistance = total;
+            }
+          }
+        },
+      });
+    }
+
+    // All features now have the personalDistance property calculated.
+    // Normalise the data and update the ratings/ui.
+    for (var j = 0; j < currentData.features.length; j++) {
+      currentData.features[j].properties.personalDistance /= maxDistance;
+    }
+    updateUi();
+
+    $('#input-view').fadeOut(); // Show the results
+  } else {
+    $('#input-view').fadeOut(); // Show the results
+  }
+}
 
 function updateUi() {
   $('#are-range-label').html('Area (' + areaImportance + ')');
@@ -379,6 +486,7 @@ function updateUi() {
   $('#soccerfield-range-label').html('Soccerfield (' + soccerfieldImportance + ')');
   $('#restaurant-range-label').html('Restaurant (' + restaurantImportance + ')');
   $('#subway-range-label').html('Subway (' + subwayImportance + ')');
+  $('#personal-distance-range-label').html('Personal Distance (' + personalDistanceImportance + ')');
 
   if (currentData) {
     weightGeoJson(currentData);
@@ -517,7 +625,7 @@ function initRouteInput() {
     }
   });
 
-  // The Html used for a single input field to seach places
+  // The Html used for a single input field to search places
   var nodeHtml =
       '<div class="two fields">' +
         '<div class="field">' +
@@ -544,37 +652,12 @@ function initRouteInput() {
     // Allow Removal of Places
     // Be sure to update the data, ui and the markers on teh map
     node.find('.ui.negative.button').click(function() {
-      var index = findIndexOfNode(node);
-
-      if (selectedPlaces[index].marker != null) {
-        selection_map.removeLayer(selectedPlaces[index].marker);
-      }
-      selectedPlaces.splice(index, 1);
-      node.remove();
-      updateIconIndices();
+      deletePlace(node);
     });
 
-    // Configure The Search function of the textbox
+    // Configure The Search function of the Textbox
     node.api({
-      mockResponseAsync: function(settings, callback) {
-        const query = settings.urlData.query;
-
-        if (query) {
-          var queryOptions = {
-            query: query,
-            proximity: mapViewport.center,
-          };
-          geocoder.query(queryOptions, function(error, data) {
-            if (error) {
-              callback([]);
-            } else {
-              callback(data.results);
-            }
-          });
-        } else {
-          callback([]);
-        }
-      },
+      mockResponseAsync: queryPlace,
     }).search({
       fields: {
         results: 'features',
@@ -627,9 +710,47 @@ function initRouteInput() {
     return index;
   }
 
+  // Used to query a place from the geocoder using the input of the user
+  function queryPlace(settings, callback) {
+    const query = settings.urlData.query;
+
+    if (query) {
+      var queryOptions = {
+        query: query,
+        proximity: mapViewport.center,
+      };
+      geocoder.query(queryOptions, function(error, data) {
+        if (error) {
+          callback([]);
+        } else {
+          callback(data.results);
+        }
+      });
+    } else {
+      callback([]);
+    }
+  }
+
+  // Deletes a place (out of the ui, the map and the data)
+  function deletePlace(node) {
+    var index = findIndexOfNode(node);
+
+    if (selectedPlaces[index].marker != null) {
+      selection_map.removeLayer(selectedPlaces[index].marker);
+    }
+    selectedPlaces.splice(index, 1);
+    node.remove();
+    updateIconIndices();
+
+    $('#add-place').show();
+  }
+
   // Add an click listener to the 'Add Place' Button
   $('#add-place').click(function() {
     addPlace();
-  });
 
+    if (selectedPlaces.length >= maxNumberOfUserPlaces) {
+      $('#add-place').hide();
+    }
+  });
 }

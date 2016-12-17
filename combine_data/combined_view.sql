@@ -2,14 +2,14 @@
 
 /** CREATE View area_ratings AS **/
 CREATE TABLE area_ratings AS
-SELECT a.gid as gid, a.geom as geom, a.ntaname as ntaname, a.boro_name as boro_name,
-	size_rating.rating as size_rating, center_rating.rating as center_rating,
-	university_rating.total as university_rating, parking_rating.total as parking_rating,
-	school_rating.total as school_rating, rental_rating.total as rental_rating,
-	population_rating.populationfactor as population_rating,
-	complaint_rating.total as complaint_rating, park_ratings.rating as park_ratings,
-	playground_ratings.rating as playground_ratings, restaurant_rating.rating as restaurant_rating,
-	soccerfields_rating.rating as soccerfields_rating, subway_rating.rating as subway_rating
+SELECT a.gid as gid, a.geom as geom, ST_Centroid(a.geom) as center, a.ntaname as ntaname, a.boro_name as boro_name,
+  size_rating.rating as size_rating, center_rating.rating as center_rating,
+  university_rating.total as university_rating, parking_rating.total as parking_rating,
+  school_rating.total as school_rating, rental_rating.total as rental_rating,
+  population_rating.populationfactor as population_rating,
+  complaint_rating.total as complaint_rating, park_ratings.rating as park_ratings,
+  playground_ratings.rating as playground_ratings, restaurant_rating.rating as restaurant_rating,
+  soccerfields_rating.rating as soccerfields_rating, subway_rating.rating as subway_rating
 FROM areas as a
 LEFT JOIN area_size_rating AS size_rating
 ON a.gid = size_rating.gid 
@@ -37,7 +37,6 @@ LEFT JOIN soccerfields_rating as soccerfields_rating
 on a.gid = soccerfields_rating.gid
 LEFT JOIN subway_rating as subway_rating
 on a.gid = subway_rating.gid;
-
 DROP TABLE area_ratings;
 
 /** This compound view will be served by the GeoServer **/
