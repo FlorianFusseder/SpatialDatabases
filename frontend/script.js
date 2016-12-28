@@ -402,33 +402,50 @@ function userQuestionDialogFinished() {
 
   // Only query the server for distances if the user entered his daily route
   if (selectedPlaces.length > 0) {
-    var regionCenters = currentData.features.map(function(feature) {
-      return feature.properties.center.coordinates;
+    var promise = queryRouteDistance();
+
+    promise.then(function(result) {
+      $('#input-view').fadeOut(); // Show the results
     });
+  } else {
+    $('#input-view').fadeOut(); // Show the results
+  }
+}
 
-    // Keep track of the maximum distance to normalise the data
-    var maxDistance = 1;
+function queryRouteDistance() {
+  var regionCenters = currentData.features.map(function(feature) {
+    return feature.properties.center.coordinates;
+  });
 
-    // Wee need to batch request the distances.
-    // Mapbox only allows 100 places per request.
-    var regionsPerRequest = (maxNumberOfPlacesInDistanceQuery - maxNumberOfUserPlaces);
-    for (var i = 0; i < regionCenters.length; i += regionsPerRequest) {
+  // Keep track of the maximum distance to normalise the data
+  var maxDistance = 1;
 
-      // We always request in the following format:
-      // fixed number of region centers concated with all of the users places.
-      // This allows us to read all needed times out of the response.
-      var requestData = {
-        'coordinates': regionCenters.slice(i, i + regionsPerRequest).concat(selectedPlaces),
-      };
+  // Keep promises of our requests to be able to fetch the data async
+  var promises = [];
 
-      // Calculate all of the distances using mapbox
+  // Wee need to batch request the distances.
+  // Mapbox only allows 100 places per request.
+  var regionsPerRequest = (maxNumberOfPlacesInDistanceQuery - maxNumberOfUserPlaces);
+  for (var i = 0; i < regionCenters.length; i += regionsPerRequest) {
+
+    // We always request in the following format:
+    // fixed number of region centers concated with all of the users places.
+    // This allows us to read all needed times out of the response.
+    var requestData = {
+      'coordinates': regionCenters.slice(i, i + regionsPerRequest).concat(selectedPlaces),
+    };
+
+    // Calculate all of the distances using mapbox
+    var promise = new Promise(function(resolve, reject) {
+      var innerI = i;
+
       $.ajax({
         url: distanceApiUrl,
         data: JSON.stringify(requestData),
         contentType: 'application/json; charset=utf-8',
         dataType: 'json',
         type: 'POST',
-        async: false, // TODO: Add async code with promises. For now this is easier.
+        async: true,
         success: function (data, status, xhr) {
           // The Result Data will contain an matrix with distances
           // from each point to each other point.
@@ -449,16 +466,25 @@ function userQuestionDialogFinished() {
 
             // Calculate total and save it as a property
             var total = centerToFirstPlace + fixedRouteDistance + lastPlaceToCenter;
-            currentData.features[i + k].properties.personalDistance = total;
+            currentData.features[innerI + k].properties.personalDistance = total;
 
             if (total > maxDistance) {
               maxDistance = total;
             }
           }
+
+          resolve(true);
+        },
+        error: function(error) {
+          reject(error);
         },
       });
-    }
+    });
 
+    promises.push(promise);
+  }
+
+  return Promise.all(promises).then(function(result) {
     // All features now have the personalDistance property calculated.
     // Normalise the data and update the ratings/ui.
     for (var j = 0; j < currentData.features.length; j++) {
@@ -466,10 +492,8 @@ function userQuestionDialogFinished() {
     }
     updateUi();
 
-    $('#input-view').fadeOut(); // Show the results
-  } else {
-    $('#input-view').fadeOut(); // Show the results
-  }
+    return true;
+  });
 }
 
 function updateUi() {
