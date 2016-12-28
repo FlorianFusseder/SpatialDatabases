@@ -1,3 +1,22 @@
+/*
+ * Move to New York application.
+ *
+ * The app performs these steps:
+ *  - Load geo json from server (for main map)
+ *  - Accept users general preferences
+ *  - Toggle views to input step 2
+ *  - Display map and sear field to add any number of places
+ *  - Toggle vies to  input step 3 (loading indicator)
+ *  - Query mapbox for distances to places given by user
+ *  - Calculate score based on these distances
+ *  - Hide initial selection page
+ *  - Show map with 2 sidebars
+ *  - When slider on left sidebar is changed -> update ratings
+ *  - When ratings change update the map and the right side bar (ordered results)
+ *
+ * For all actions please see the code. I tried to add comments to make everything clear.
+ */
+
 ////////////////////////////////////
 // Constants & Configuration
 ////////////////////////////////////
@@ -36,10 +55,11 @@ var dataSource =  './geoserver/spt-project/ows' +
                   '&typeName=spt-project:area_ratings' +
                   '&maxFeatures=500' +
                   '&outputFormat=application%2Fjson'; // Output GeoJson for interactive display
+// Uncomment for static data
 // dataSource = './areas.geojson';
 
 ////////////////////////////////////
-// Main Programm
+// Main Program
 ////////////////////////////////////
 var map = initializeMap();
 
@@ -49,9 +69,11 @@ var geocoder = L.mapbox.geocoder('mapbox.places');
 // Holds the current GeoJSON data displayed on the map
 var currentData;
 var currentLayer;
+
 // Will be computed to find correct colors of sectors
 var maxValuation;
 var minValuation;
+
 // Hold user input values
 var areaImportance = 0;
 var centerImportance = 0;
@@ -67,6 +89,7 @@ var soccerfieldImportance = 0;
 var restaurantImportance = 0;
 var subwayImportance = 0;
 var personalDistanceImportance = 5;
+
 // Hold context between html ui elements and map elements
 var cardsForFeatures;
 
@@ -74,19 +97,18 @@ var cardsForFeatures;
 // Load our data
 $.get(dataSource)
     .done(function (data) {
-      console.log('Got Data');
-
       currentData = data;
       currentLayer = L.geoJson(currentData, { style: style, onEachFeature: onEachFeature });
       currentLayer.addTo(map);
 
+      // Call it when every data/ratings change to keep the map and ranking list updated
       updateUi();
     })
     .fail(function () {
-      console.log('Error loading geoJSON file!');
+      alert('Error loading geoJSON file!');
     });
 
-// Init Route Input UI
+// Init Route Input UI (users important places)
 var selectedPlaces = [];
 initRouteInput();
 
@@ -103,11 +125,14 @@ function initializeMap() {
     maxZoom: mapViewport.maxZoomLevel,
   }).setView(mapViewport.center, mapViewport.initialZoomLevel);
 };
+
+// Initiating map for places selection
 function initializeSelectionMap() {
   return L.mapbox.map('selection-map', 'mapbox.light')
             .setView(mapViewport.center, mapViewport.initialZoomLevel);
 };
 
+// Returns the color of a region based on the given rating value
 function getColor(valuation) {
   var range = maxValuation - minValuation;
 
@@ -126,6 +151,7 @@ function getColor(valuation) {
                             return '#d83a3a';
 }
 
+// Returns the style for a region on the map
 function style(feature) {
   return {
     fillColor: getColor(feature.valuation),
@@ -226,7 +252,6 @@ function subwayValuation(feature) {
 function personalDistanceValuation(feature) {
   return feature.properties.personalDistance * personalDistanceImportance * -1 || 0;
 }
-
 // TODO: Add proper valuation functions for different feature aspects
 
 
@@ -234,27 +259,44 @@ function personalDistanceValuation(feature) {
 // UI Code
 ////////////////////////////////////
 $(document).ready(function () {
-  $('#toggle-left-nav').click(function () {
-    var $leftNav = $('#left-nav');
+  initializeSideNavs();
+  initializeSliders();
+  initializeCheckboxes();
 
-    if ($leftNav.css('margin-left').replace('px', '') < 0) {
-      $leftNav.animate({'margin-left': 0}, {step: animationStep});
-    } else {
-      $leftNav.animate({'margin-left': -271}, {step: animationStep});
-    }
+  initializeFinishFirstStepButton();
+  initializeFinishSecondStepButton()
+});
+
+function initializeFinishFirstStepButton() {
+  $('#finish-first-step').click(function () {
+    $('#first-step-indicator').toggleClass('completed');
+    $('#first-step-indicator').toggleClass('active');
+    $('#second-step-indicator').toggleClass('active');
+    $('#first-step').hide();
+    $('#second-step').show();
+
+    // Needed to correctly load the map
+    selection_map.invalidateSize();
   });
+}
 
-  $('#toggle-right-nav').click(function () {
-    var $rightNav = $('#right-nav');
+function initializeFinishSecondStepButton() {
+  $('#finish-second-step').click(function () {
+    $('#second-step-indicator').toggleClass('completed');
+    $('#second-step-indicator').toggleClass('active');
+    $('#third-step-indicator').toggleClass('active');
+    $('#second-step').hide();
+    $('#third-step').show();
 
-    if ($rightNav.css('margin-right').replace('px', '') < 0) {
-      $rightNav.animate({'margin-right': 0}, {step: animationStep});
-    } else {
-      $rightNav.animate({'margin-right': -271}, {step: animationStep});
-    }
+    userQuestionDialogFinished();
   });
+}
 
-  // Sliders
+function initializeCheckboxes() {
+  $('.ui.checkbox').checkbox();
+}
+
+function initializeSliders() {
   $('#area-range').range({
     min: -5,
     max: 5,
@@ -353,31 +395,29 @@ $(document).ready(function () {
     step: 1,
     onChange: function (val) { personalDistanceImportance = val; updateUi(); },
   });
+}
 
+function initializeSideNavs() {
+  $('#toggle-left-nav').click(function () {
+    var $leftNav = $('#left-nav');
 
-  $('.ui.checkbox').checkbox();
-
-  $('#finish-first-step').click(function () {
-    $('#first-step-indicator').toggleClass('completed');
-    $('#first-step-indicator').toggleClass('active');
-    $('#second-step-indicator').toggleClass('active');
-    $('#first-step').hide();
-    $('#second-step').show();
-
-    // Needed to correctly load the map
-    selection_map.invalidateSize();
+    if ($leftNav.css('margin-left').replace('px', '') < 0) {
+      $leftNav.animate({'margin-left': 0}, {step: animationStep});
+    } else {
+      $leftNav.animate({'margin-left': -271}, {step: animationStep});
+    }
   });
 
-  $('#finish-second-step').click(function () {
-    $('#second-step-indicator').toggleClass('completed');
-    $('#second-step-indicator').toggleClass('active');
-    $('#third-step-indicator').toggleClass('active');
-    $('#second-step').hide();
-    $('#third-step').show();
+  $('#toggle-right-nav').click(function () {
+    var $rightNav = $('#right-nav');
 
-    userQuestionDialogFinished();
+    if ($rightNav.css('margin-right').replace('px', '') < 0) {
+      $rightNav.animate({'margin-right': 0}, {step: animationStep});
+    } else {
+      $rightNav.animate({'margin-right': -271}, {step: animationStep});
+    }
   });
-});
+}
 
 // Called when the user finished the second step of the initial questions.
 // Use this to predefine the slider values and to query additional data.
@@ -412,6 +452,9 @@ function userQuestionDialogFinished() {
   }
 }
 
+// Queries the rote walking distances for the users daily routes.
+// Adds a rating for the resulting distance to every region.
+// Returns a promise that resolves when all data is available.
 function queryRouteDistance() {
   var regionCenters = currentData.features.map(function(feature) {
     return feature.properties.center.coordinates;
@@ -497,6 +540,19 @@ function queryRouteDistance() {
 }
 
 function updateUi() {
+  updateSliderValues();
+
+  if (currentData) {
+    weightGeoJson(currentData);
+    updateResultList();
+  }
+
+  if (currentLayer) {
+    currentLayer.setStyle(style);
+  }
+}
+
+function updateSliderValues() {
   $('#are-range-label').html('Area (' + areaImportance + ')');
   $('#center-range-label').html('Center (' + centerImportance + ')');
   $('#university-range-label').html('University (' + universityImportance + ')');
@@ -511,42 +567,36 @@ function updateUi() {
   $('#restaurant-range-label').html('Restaurant (' + restaurantImportance + ')');
   $('#subway-range-label').html('Subway (' + subwayImportance + ')');
   $('#personal-distance-range-label').html('Personal Distance (' + personalDistanceImportance + ')');
+}
 
-  if (currentData) {
-    weightGeoJson(currentData);
+function updateResultList() {
+  $('#result-list').html('');
+  cardsForFeatures = {};
 
-    $('#result-list').html('');
-    cardsForFeatures = {};
+  currentData.features.forEach(function (feature) {
+    var nodeHtml =  '<a class="ui card" id="feature-card-' + feature.id + '">' +
+        '<div class ="content">' +
+        '<div class="header">' + feature.properties.ntaname + '</div>' +
+        '<div class="meta">' + feature.properties.boro_name + '</div>' +
+        '</div>' +
+        '</a>';
 
-    currentData.features.forEach(function (feature) {
-      var nodeHtml =  '<a class="ui card" id="feature-card-' + feature.id + '">' +
-                        '<div class ="content">' +
-                          '<div class="header">' + feature.properties.ntaname + '</div>' +
-                          '<div class="meta">' + feature.properties.boro_name + '</div>' +
-                        '</div>' +
-                      '</a>';
+    var node = $(nodeHtml).hover(
+        function () {
+          highlightFeature(feature);
+        },
+        function () {
+          resetHighlight(feature);
+        }
+    ).click(
+        function () {
+          zoomToFeature(feature);
+        }
+    );
+    node.appendTo($('#result-list'));
 
-      var node = $(nodeHtml).hover(
-          function () {
-            highlightFeature(feature);
-          },
-          function () {
-            resetHighlight(feature);
-          }
-      ).click(
-          function () {
-            zoomToFeature(feature);
-          }
-      );
-      node.appendTo($('#result-list'));
-
-      cardsForFeatures[feature.id] = node;
-    });
-  }
-
-  if (currentLayer) {
-    currentLayer.setStyle(style);
-  }
+    cardsForFeatures[feature.id] = node;
+  });
 }
 
 function animationStep(now, tween) {
