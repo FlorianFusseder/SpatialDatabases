@@ -90,6 +90,14 @@ var restaurantImportance = 0;
 var subwayImportance = 0;
 var personalDistanceImportance = 5;
 
+var preferredBrough = [];
+preferredBrough["queens"] = false;
+preferredBrough["brooklyn"] = false;
+preferredBrough["manhattan"] = false;
+preferredBrough["bronx"] = false;
+preferredBrough["stateIsland"] = false;
+
+
 // Hold context between html ui elements and map elements
 var cardsForFeatures;
 
@@ -294,6 +302,7 @@ function initializeFinishSecondStepButton() {
 
 function initializeCheckboxes() {
   $('.ui.checkbox').checkbox();
+  $('.ui.radio.checkbox').checkbox();
 }
 
 function initializeSliders() {
@@ -422,13 +431,63 @@ function initializeSideNavs() {
 // Called when the user finished the second step of the initial questions.
 // Use this to predefine the slider values and to query additional data.
 function userQuestionDialogFinished() {
-  // TODO: Pre set the weighting sliders
-  // TODO: query for points that the user is interested in
-  if ($('#has-children').prop('checked') == true) {
-    $('#area-range').range('set value', 1);
-  } else {
-    $('#area-range').range('set value', -1);
-  }
+  // Age, under 25 (0), 25-35 (1), 36-50
+  var age = $('input[name=age]:checked').val();
+
+  // General Questions
+  var hasChildren     = $('#has-children').prop('checked');
+  var isStudent       = $('#is-student').prop('checked');
+  var hasCar          = $('#has-car').prop('checked');
+  var doesSport       = $('#does-sport').prop('checked');
+  var usesSubway      = $('#use-subway').prop('checked');
+  var likesNature     = $('#likes-nature').prop('checked');
+
+  // Quiet or vibrant, quiet (0), don't care (1), vibrant (2)
+  var vibrant = $('input[name=vibrant]:checked').val();
+
+  // Price,
+  // low price is very important (0), low price is a little important (1), price is not important at all (2)
+  var price = $('input[name=price]:checked').val();
+
+  // Central, outside (0), don't care (1), central (2)
+  var central = $('input[name=central]:checked').val();
+
+  // Important Boroughs
+  preferredBrough["queens"] = $('#borough-queens').prop('checked');
+  preferredBrough["brooklyn"] = $('#borough-brooklyn').prop('checked');
+  preferredBrough["manhattan"] = $('#borough-manhattan').prop('checked');
+  preferredBrough["bronx"] = $('#borough-bronx').prop('checked');
+  preferredBrough["stateIsland"] = $('#borough-staten-island').prop('checked');
+
+  $('#borough-queens-sidenav').prop('checked', preferredBrough["queens"]);
+  $('#borough-queens-sidenav').change(function() {
+    preferredBrough["queens"] = $(this).prop('checked');
+    updateUi();
+  });
+  $('#borough-brooklyn-sidenav').prop('checked', preferredBrough["brooklyn"]);
+  $('#borough-brooklyn-sidenav').change(function() {
+    preferredBrough["brooklyn"] = $(this).prop('checked');
+    updateUi();
+  });
+  $('#borough-manhattan-sidenav').prop('checked', preferredBrough["manhattan"]);
+  $('#borough-manhattan-sidenav').change(function() {
+    preferredBrough["manhattan"] = $(this).prop('checked');
+    updateUi();
+  });
+  $('#borough-bronx-sidenav').prop('checked', preferredBrough["bronx"]);
+  $('#borough-bronx-sidenav').change(function() {
+    preferredBrough["bronx"] = $(this).prop('checked');
+    updateUi();
+  });
+  $('#borough-staten-island-sidenav').prop('checked', preferredBrough["stateIsland"]);
+  $('#borough-staten-island-sidenav').change(function() {
+    preferredBrough["stateIsland"] = $(this).prop('checked');
+    updateUi();
+  });
+
+  // TODO: Pre-Weight sliders
+
+
   // Apply our preselection to the data
   updateUi();
 

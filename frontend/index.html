@@ -87,6 +87,48 @@
             <label id="subway-range-label">Center Importance</label>
             <div class="ui range" id="subway-range"></div>
           </div>
+
+          <h3>Do you have specific boroughs that you want to live in?</h3> <!-- Preffered Boroughs -->
+          <div class="ui vertical segment">
+            <div class="inline field">
+              <div class="ui checkbox">
+                <input type="checkbox" tabindex="0" class="hidden" id="borough-queens-sidenav">
+                <label>Queens</label>
+              </div>
+            </div>
+          </div>
+          <div class="ui vertical segment">
+            <div class="inline field">
+              <div class="ui checkbox">
+                <input type="checkbox" tabindex="0" class="hidden" id="borough-brooklyn-sidenav">
+                <label>Brooklyn</label>
+              </div>
+            </div>
+          </div>
+          <div class="ui vertical segment">
+            <div class="inline field">
+              <div class="ui checkbox">
+                <input type="checkbox" tabindex="0" class="hidden" id="borough-manhattan-sidenav">
+                <label>Manhattan</label>
+              </div>
+            </div>
+          </div>
+          <div class="ui vertical segment">
+            <div class="inline field">
+              <div class="ui checkbox">
+                <input type="checkbox" tabindex="0" class="hidden" id="borough-bronx-sidenav">
+                <label>Bronx</label>
+              </div>
+            </div>
+          </div>
+          <div class="ui vertical segment">
+            <div class="inline field">
+              <div class="ui checkbox">
+                <input type="checkbox" tabindex="0" class="hidden" id="borough-staten-island-sidenav">
+                <label>Staten Island</label>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -143,33 +185,205 @@
           <!-- First Step: General Questions -->
           <div class="ui segment left aligned" id="first-step">
             <div class="ui form">
-              <div class="inline field">
-                <div class="ui checkbox">
-                  <input type="checkbox" tabindex="0" class="hidden" id="has-children">
-                  <label>Do you have children?</label>
+              <h3>How old are you?</h3> <!-- Age Selection -->
+              <div class="inline fields">
+                <div class="field">
+                  <div class="ui radio checkbox">
+                    <input type="radio" name="age" checked="" tabindex="0" class="hidden" value="0">
+                    <label>under 25</label>
+                  </div>
+                </div>
+                <div class="field">
+                  <div class="ui radio checkbox">
+                    <input type="radio" name="age" tabindex="0" class="hidden" value="1">
+                    <label>25 to 35</label>
+                  </div>
+                </div>
+                <div class="field">
+                  <div class="ui radio checkbox">
+                    <input type="radio" name="age" tabindex="0" class="hidden" value="2">
+                    <label>36 to 50</label>
+                  </div>
+                </div>
+                <div class="field">
+                  <div class="ui radio checkbox">
+                    <input type="radio" name="age" tabindex="0" class="hidden" value="3">
+                    <label>over 50</label>
+                  </div>
                 </div>
               </div>
 
-              <div class="inline field">
-                <div class="ui checkbox">
-                  <input type="checkbox" tabindex="0" class="hidden" name="has-car">
-                  <label>Do you have a car?</label>
+              <h3>Please answer the following questions</h3> <!-- General Questions -->
+              <div class="ui grid">
+                <div class="eight wide column">
+                  <div class="inline field">
+                    <div class="ui checkbox">
+                      <input type="checkbox" tabindex="0" class="hidden" id="has-children">
+                      <label>Do you have children?</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="eight wide column">
+                  <div class="inline field">
+                    <div class="ui checkbox">
+                      <input type="checkbox" tabindex="0" class="hidden" id="is-student">
+                      <label>Are you a student</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="eight wide column">
+                  <div class="inline field">
+                    <div class="ui checkbox">
+                      <input type="checkbox" tabindex="0" class="hidden" id="has-car">
+                      <label>Do you own a car?</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="eight wide column">
+                  <div class="inline field">
+                    <div class="ui checkbox">
+                      <input type="checkbox" tabindex="0" class="hidden" id="has-dog">
+                      <label>Do you have a dog?</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="eight wide column">
+                  <div class="inline field">
+                    <div class="ui checkbox">
+                      <input type="checkbox" tabindex="0" class="hidden" id="does-sport">
+                      <label>Do you do outdoor sports?</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="eight wide column">
+                  <div class="inline field">
+                    <div class="ui checkbox">
+                      <input type="checkbox" tabindex="0" class="hidden" id="use-subway">
+                      <label>Do you use the subway often?</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="eight wide column">
+                  <div class="inline field">
+                    <div class="ui checkbox">
+                      <input type="checkbox" tabindex="0" class="hidden" id="likes-nature">
+                      <label>Do you like nature?</label>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              <div class="inline field">
-                <div class="ui checkbox">
-                  <input type="checkbox" tabindex="0" class="hidden" name="likes-people">
-                  <label>Do you want to live in a vibrant neighborhood?</label>
+              <h3>Do you prefer an quiet or an vibrant area?</h3> <!-- Vibrant vs. Quiet -->
+              <div class="ui equal width grid">
+                <div class="column inline field">
+                  <div class="ui radio checkbox">
+                    <input type="radio" name="vibrant" checked="" tabindex="0" class="hidden" value="0">
+                    <label>I prefer quiet areas</label>
+                  </div>
+                </div>
+                <div class="column inline field">
+                  <div class="ui radio checkbox">
+                    <input type="radio" name="vibrant" tabindex="0" class="hidden" value="1" checked>
+                    <label>I don't care</label>
+                  </div>
+                </div>
+                <div class="column inline field">
+                  <div class="ui radio checkbox">
+                    <input type="radio" name="vibrant" tabindex="0" class="hidden" value="2">
+                    <label>I like vibrant areas</label>
+                  </div>
                 </div>
               </div>
 
-              <div class="inline field">
-                <div class="ui checkbox">
-                  <input type="checkbox" tabindex="0" class="hidden" name="needs-subway">
-                  <label>Do you need to take the subway often?</label>
+              <h3>How important are rental prices for you?</h3> <!-- Price -->
+              <div class="ui equal width grid">
+                <div class="column inline field">
+                  <div class="ui radio checkbox">
+                    <input type="radio" name="price" checked="" tabindex="0" class="hidden" value="0">
+                    <label>Money is a big concern</label>
+                  </div>
+                </div>
+                <div class="column inline field">
+                  <div class="ui radio checkbox">
+                    <input type="radio" name="price" tabindex="0" class="hidden" value="1" checked>
+                    <label>It should not be overly expensive</label>
+                  </div>
+                </div>
+                <div class="column inline field">
+                  <div class="ui radio checkbox">
+                    <input type="radio" name="price" tabindex="0" class="hidden" value="2">
+                    <label>Money is no problem</label>
+                  </div>
                 </div>
               </div>
+
+              <h3>Do you want to live near the city center?</h3> <!-- Central -->
+              <div class="ui equal width grid">
+                <div class="column inline field">
+                  <div class="ui radio checkbox">
+                    <input type="radio" name="central" checked="" tabindex="0" class="hidden" value="0">
+                    <label>I prefer to live away from the center</label>
+                  </div>
+                </div>
+                <div class="column inline field">
+                  <div class="ui radio checkbox">
+                    <input type="radio" name="central" tabindex="0" class="hidden" value="1" checked>
+                    <label>I don't care</label>
+                  </div>
+                </div>
+                <div class="column inline field">
+                  <div class="ui radio checkbox">
+                    <input type="radio" name="central" tabindex="0" class="hidden" value="2">
+                    <label>I prefer to live central</label>
+                  </div>
+                </div>
+              </div>
+
+              <h3>Do you have specific boroughs that you want to live in?</h3> <!-- Preffered Boroughs -->
+              <div class="ui grid">
+                <div class="eight wide column">
+                  <div class="inline field">
+                    <div class="ui checkbox">
+                      <input type="checkbox" tabindex="0" class="hidden" id="borough-queens">
+                      <label>Queens</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="eight wide column">
+                  <div class="inline field">
+                    <div class="ui checkbox">
+                      <input type="checkbox" tabindex="0" class="hidden" id="borough-brooklyn">
+                      <label>Brooklyn</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="eight wide column">
+                  <div class="inline field">
+                    <div class="ui checkbox">
+                      <input type="checkbox" tabindex="0" class="hidden" id="borough-manhattan">
+                      <label>Manhattan</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="eight wide column">
+                  <div class="inline field">
+                    <div class="ui checkbox">
+                      <input type="checkbox" tabindex="0" class="hidden" id="borough-bronx">
+                      <label>Bronx</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="eight wide column">
+                  <div class="inline field">
+                    <div class="ui checkbox">
+                      <input type="checkbox" tabindex="0" class="hidden" id="borough-staten-island">
+                      <label>Staten Island</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <br/>
 
               <div class="ui submit button" id="finish-first-step">Next Step</div>
             </div>
