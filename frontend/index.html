@@ -10,11 +10,19 @@
     <link href='https://api.mapbox.com/mapbox.js/v3.0.1/mapbox.css' rel='stylesheet' />
 
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script
+        src="http://code.jquery.com/ui/1.11.4/jquery-ui.min.js"
+        integrity="sha256-xNjb53/rY+WmG+4L6tTl9m6PpqknWZvRt0rO1SRnJzw="
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/ui-darkness/jquery-ui.css" />
 
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.6/semantic.min.js"></script>
     <link rel="stylesheet" media="screen" href="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.6/semantic.min.css">
 
     <script src="//cdn.jsdelivr.net/bluebird/3.4.7/bluebird.min.js"></script>
+
+    <script src='./jquery-ui-slider-pips.js'></script>
+    <link href='./jquery-ui-slider-pips.css' rel='stylesheet' />
 
     <script src='./range.js'></script>
     <link href='./range.css' rel='stylesheet' />
@@ -32,60 +40,70 @@
         <div class="nav-content">
           <h2>Refine Search</h2>
           <div class="ui vertical segment">
-            <label id="personal-distance-range-label">Personal Distance</label>
-            <div class="ui range" id="personal-distance-range"></div>
+            <p>How important are short distances to your locations of interest?</p>
+            <div class="slider-container">
+              <div id="personal-distance-slider" class="slider"></div>
+            </div>
           </div>
           <div class="ui vertical segment">
-            <label id="are-range-label">Area</label>
-            <div class="ui range" id="area-range"></div>
+            <p>Do you want to live in the center of NY or outside?</p>
+            <div class="slider-container">
+              <div id="central-slider" class="slider"></div>
+            </div>
           </div>
           <div class="ui vertical segment">
-            <label id="center-range-label">Center Importance</label>
-            <div class="ui range" id="center-range"></div>
+            <p>Do you want to live near a university?</p>
+            <div class="slider-container">
+              <div id="university-slider" class="slider"></div>
+            </div>
           </div>
           <div class="ui vertical segment">
-            <label id="university-range-label">Center Importance</label>
-            <div class="ui range" id="university-range"></div>
+            <p>How important is the parking situation for you?</p>
+            <div class="slider-container">
+              <div id="parking-slider" class="slider"></div>
+            </div>
           </div>
           <div class="ui vertical segment">
-            <label id="parking-range-label">Center Importance</label>
-            <div class="ui range" id="parking-range"></div>
+            <p>Do you want to live near schools?</p>
+            <div class="slider-container">
+              <div id="school-slider" class="slider"></div>
+            </div>
           </div>
           <div class="ui vertical segment">
-            <label id="school-range-label">Center Importance</label>
-            <div class="ui range" id="school-range"></div>
+            <p>How important are cheap rental prices for you?</p>
+            <div class="slider-container">
+              <div id="rental-slider" class="slider"></div>
+            </div>
           </div>
           <div class="ui vertical segment">
-            <label id="rental-range-label">Center Importance</label>
-            <div class="ui range" id="rental-range"></div>
+            <p>Do you want to live in a vibrant area?</p>
+            <div class="slider-container">
+              <div id="vibrant-slider" class="slider"></div>
+            </div>
           </div>
           <div class="ui vertical segment">
-            <label id="population-range-label">Center Importance</label>
-            <div class="ui range" id="population-range"></div>
+            <p>How important are parks and recreational areas for you?</p>
+            <div class="slider-container">
+              <div id="park-slider" class="slider"></div>
+            </div>
           </div>
           <div class="ui vertical segment">
-            <label id="complaint-range-label">Center Importance</label>
-            <div class="ui range" id="complaint-range"></div>
+            <p>Do you want to live near play areas?</p>
+            <div class="slider-container">
+              <div id="playground-slider" class="slider"></div>
+            </div>
           </div>
           <div class="ui vertical segment">
-            <label id="playground-range-label">Center Importance</label>
-            <div class="ui range" id="playground-range"></div>
+            <p>How important is the subway for you?</p>
+            <div class="slider-container">
+              <div id="subway-slider" class="slider"></div>
+            </div>
           </div>
           <div class="ui vertical segment">
-            <label id="park-range-label">Center Importance</label>
-            <div class="ui range" id="park-range"></div>
-          </div>
-          <div class="ui vertical segment">
-            <label id="soccerfield-range-label">Center Importance</label>
-            <div class="ui range" id="soccerfield-range"></div>
-          </div>
-          <div class="ui vertical segment">
-            <label id="restaurant-range-label">Center Importance</label>
-            <div class="ui range" id="restaurant-range"></div>
-          </div>
-          <div class="ui vertical segment">
-            <label id="subway-range-label">Center Importance</label>
-            <div class="ui range" id="subway-range"></div>
+            <p>How important is it that there are restaurants around?</p>
+            <div class="slider-container">
+              <div id="restaurant-slider" class="slider"></div>
+            </div>
           </div>
 
           <h3>Do you have specific boroughs that you want to live in?</h3> <!-- Preffered Boroughs -->
@@ -170,8 +188,8 @@
             </div>
             <div class="step" id="second-step-indicator">
               <div class="content">
-                <div class="title">Details</div>
-                <div class="description">Enter optional details for better results</div>
+                <div class="title">Locations of Interest</div>
+                <div class="description">Enter your daily route</div>
               </div>
             </div>
             <div class="step" id="third-step-indicator">
@@ -391,7 +409,7 @@
 
           <!-- Second Step: Ask for a typical day (places that the person visits often) -->
           <div class="ui segment left aligned" id="second-step" hidden>
-            <h3>Details</h3>
+            <h3>Locations of Interest</h3>
             <div class="ui grid">
               <div class="eight wide column">
                 <p>
