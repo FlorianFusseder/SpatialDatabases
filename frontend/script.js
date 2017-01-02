@@ -75,27 +75,26 @@ var maxValuation;
 var minValuation;
 
 // Hold user input values
-var areaImportance = 0;
 var centerImportance = 0;
 var universityImportance = 0;
 var parkingImportance = 0;
 var schoolImportance = 0;
 var rentalImportance = 0;
+var vibrantImportance = 0;
+var parkImportance = 0;
 var populationImportance = 0;
 var complaintImportance = 0;
 var playgroundImportance = 0;
-var parkImportance = 0;
-var soccerfieldImportance = 0;
 var restaurantImportance = 0;
 var subwayImportance = 0;
 var personalDistanceImportance = 5;
 
-var preferredBrough = [];
-preferredBrough["queens"] = false;
-preferredBrough["brooklyn"] = false;
-preferredBrough["manhattan"] = false;
-preferredBrough["bronx"] = false;
-preferredBrough["stateIsland"] = false;
+var preferredBoroughs = [];
+preferredBoroughs["queens"] = false;
+preferredBoroughs["brooklyn"] = false;
+preferredBoroughs["manhattan"] = false;
+preferredBoroughs["bronx"] = false;
+preferredBoroughs["statenIsland"] = false;
 
 
 // Hold context between html ui elements and map elements
@@ -181,21 +180,26 @@ function weightGeoJson(geoJson) {
   geoJson.features.forEach(function (feature) {
     feature.valuation = 0;
 
-    feature.valuation += areaValuation(feature);
     feature.valuation += centerDistanceValuation(feature);
     feature.valuation += universityValuation(feature);
     feature.valuation += parkingValuation(feature);
     feature.valuation += schoolValuation(feature);
     feature.valuation += rentalValuation(feature);
-    feature.valuation += populationValuation(feature);
-    feature.valuation += complaintValuation(feature);
     feature.valuation += parkingValuation(feature);
     feature.valuation += parkValuation(feature);
     feature.valuation += playgroundValuation(feature);
     feature.valuation += restaurantValuation(feature);
-    feature.valuation += soccerfieldsValuation(feature);
     feature.valuation += subwayValuation(feature);
     feature.valuation += personalDistanceValuation(feature);
+
+    var preferredBoroughsWeight = 3;
+    if (preferredBoroughs["queens"] && feature.properties.boro_name == "Queens"
+        || preferredBoroughs["brooklyn"] && feature.properties.boro_name == "Brooklyn"
+        || preferredBoroughs["manhattan"] && feature.properties.boro_name == "Manhattan"
+        || preferredBoroughs["bronx"] && feature.properties.boro_name == "Bronx"
+        || preferredBoroughs["statenIsland"] && feature.properties.boro_name == "Staten Island") {
+      feature.valuation = (feature.valuation + 1) * preferredBoroughsWeight;
+    }
 
     // Keep minimum and maximum, useful to get good colors for the map
     if (feature.valuation > maxValuation) {
@@ -217,48 +221,36 @@ function weightGeoJson(geoJson) {
 
 // Values a given feature by using an algorithm.
 // Returns positive or negative values based on how good this given feature is.
-function areaValuation(feature) {
-  return feature.properties.size_rating * areaImportance || 0;
-}
 function centerDistanceValuation(feature) {
   // Its better to be close to the center, so value it negative
-  return feature.properties.center_rating * centerImportance * -1 || 0;
+  return 1 + feature.properties.center_rating * centerImportance * -1 || 0;
 }
 function universityValuation(feature) {
-  return feature.properties.university_rating * universityImportance || 0;
+  return 1 + feature.properties.university_rating * universityImportance || 0;
 }
 function parkingValuation(feature) {
-  return feature.properties.parking_rating * parkingImportance || 0;
+  return 1 + feature.properties.parking_rating * parkingImportance || 0;
 }
 function schoolValuation(feature) {
-  return feature.properties.school_rating * schoolImportance || 0;
+  return 1 + feature.properties.school_rating * schoolImportance || 0;
 }
 function rentalValuation(feature) {
-  return feature.properties.rental_rating * rentalImportance || 0;
-}
-function populationValuation(feature) {
-  return feature.properties.population_rating * populationImportance || 0;
-}
-function complaintValuation(feature) {
-  return feature.properties.complaint_rating * complaintImportance || 0;
+  return 1 + feature.properties.rental_rating * rentalImportance * - 1 || 0;
 }
 function parkValuation(feature) {
-  return feature.properties.park_ratings * parkImportance || 0;
+  return 1 + feature.properties.park_ratings * parkImportance || 0;
 }
 function playgroundValuation(feature) {
-  return feature.properties.playground_ratings * playgroundImportance || 0;
+  return 1 + feature.properties.playground_ratings * playgroundImportance || 0;
 }
 function restaurantValuation(feature) {
-  return feature.properties.restaurant_rating * restaurantImportance || 0;
-}
-function soccerfieldsValuation(feature) {
-  return feature.properties.soccerfields_rating * soccerfieldImportance || 0;
+  return 1 + feature.properties.restaurant_rating * restaurantImportance || 0;
 }
 function subwayValuation(feature) {
-  return feature.properties.subway_rating * subwayImportance || 0;
+  return 1 + feature.properties.subway_rating * subwayImportance || 0;
 }
 function personalDistanceValuation(feature) {
-  return feature.properties.personalDistance * personalDistanceImportance * -1 || 0;
+  return 1 + feature.properties.personalDistance * personalDistanceImportance * -1 || 0;
 }
 // TODO: Add proper valuation functions for different feature aspects
 
@@ -306,104 +298,149 @@ function initializeCheckboxes() {
 }
 
 function initializeSliders() {
-  $('#area-range').range({
-    min: -5,
-    max: 5,
-    start: 0,
-    step: 1,
-    onChange: function (val) { areaImportance = val; updateUi(); },
-  });
-  $('#center-range').range({
-    min: -5,
-    max: 5,
-    start: 0,
-    step: 1,
-    onChange: function (val) { centerImportance = val; updateUi(); },
-  });
-  $('#university-range').range({
-    min: -5,
-    max: 5,
-    start: 0,
-    step: 1,
-    onChange: function (val) { universityImportance = val; updateUi(); },
-  });
-  $('#parking-range').range({
-    min: -5,
-    max: 5,
-    start: 0,
-    step: 1,
-    onChange: function (val) { parkingImportance = val; updateUi(); },
-  });
-  $('#school-range').range({
-    min: -5,
-    max: 5,
-    start: 0,
-    step: 1,
-    onChange: function (val) { schoolImportance = val; updateUi(); },
-  });
-  $('#rental-range').range({
-    min: -5,
-    max: 5,
-    start: 0,
-    step: 1,
-    onChange: function (val) { rentalImportance = val; updateUi(); },
-  });
-  $('#population-range').range({
-    min: -5,
-    max: 5,
-    start: 0,
-    step: 1,
-    onChange: function (val) { populationImportance = val; updateUi(); },
-  });
-  $('#complaint-range').range({
-    min: -5,
-    max: 5,
-    start: 0,
-    step: 1,
-    onChange: function (val) { complaintImportance = val; updateUi(); },
-  });
-  $('#playground-range').range({
-    min: -5,
-    max: 5,
-    start: 0,
-    step: 1,
-    onChange: function (val) { playgroundImportance = val; updateUi(); },
-  });
-  $('#park-range').range({
-    min: -5,
-    max: 5,
-    start: 0,
-    step: 1,
-    onChange: function (val) { parkImportance = val; updateUi(); },
-  });
-  $('#soccerfield-range').range({
-    min: -5,
-    max: 5,
-    start: 0,
-    step: 1,
-    onChange: function (val) { soccerfieldImportance = val; updateUi(); },
-  });
-  $('#restaurant-range').range({
-    min: -5,
-    max: 5,
-    start: 0,
-    step: 1,
-    onChange: function (val) { restaurantImportance = val; updateUi(); },
-  });
-  $('#subway-range').range({
-    min: -5,
-    max: 5,
-    start: 0,
-    step: 1,
-    onChange: function (val) { subwayImportance = val; updateUi(); },
-  });
-  $('#personal-distance-range').range({
-    min: -5,
-    max: 5,
-    start: 5,
-    step: 1,
-    onChange: function (val) { personalDistanceImportance = val; updateUi(); },
-  });
+  $("#personal-distance-slider")
+      .slider({ max: 1, min: 0, step: 0.1 })
+      .slider("pips", {
+        step: 5 ,
+        rest: "label",
+        labels: ["Not Important", "", "", "", "",
+                  "", "", "", "", "",
+                  "Very Important"]
+      })
+      .on("slidechange", function(e,ui) {
+        personalDistanceImportance = ui.value;
+        updateUi();
+      });
+  $("#central-slider")
+      .slider({ max: 1, min: -1, step: 0.2 })
+      .slider("pips", {
+        step: 5 ,
+        rest: "label",
+        labels: ["Outside", "", "", "", "",
+                  "Don't care", "", "", "", "",
+                  "Central"]
+      })
+      .on("slidechange", function(e,ui) {
+        centerImportance = ui.value;
+        updateUi();
+      });
+  $("#university-slider")
+      .slider({ max: 1, min: -1, step: 0.2 })
+      .slider("pips", {
+        step: 5 ,
+        rest: "label",
+        labels: ["Near", "", "", "", "",
+                  "Don't care", "", "", "", "",
+                  "Far Away"]
+      })
+      .on("slidechange", function(e,ui) {
+        universityImportance = ui.value;
+        updateUi();
+      });
+  $("#parking-slider")
+      .slider({ max: 1, min: 0, step: 0.1 })
+      .slider("pips", {
+        step: 5 ,
+        rest: "label",
+        labels: ["Not Important", "", "", "", "",
+                  "", "", "", "", "",
+                  "Very Important"]
+      })
+      .on("slidechange", function(e,ui) {
+        parkingImportance = ui.value;
+        updateUi();
+      });
+  $("#school-slider")
+      .slider({ max: 1, min: -1, step: 0.2 })
+      .slider("pips", {
+        step: 5 ,
+        rest: "label",
+        labels: ["Near", "", "", "", "",
+                  "Don't care", "", "", "", "",
+                  "Far Away"]
+      })
+      .on("slidechange", function(e,ui) {
+        schoolImportance = ui.value;
+        updateUi();
+      });
+  $("#rental-slider")
+      .slider({ max: 1, min: 0, step: 0.1 })
+      .slider("pips", {
+        step: 5 ,
+        rest: "label",
+        labels: ["Not Important", "", "", "", "",
+                  "", "", "", "", "",
+                  "Very Important"]
+      })
+      .on("slidechange", function(e,ui) {
+        rentalImportance = ui.value;
+        updateUi();
+      });
+  $("#vibrant-slider")
+      .slider({ max: 1, min: -1, step: 0.2 })
+      .slider("pips", {
+        step: 5,
+        rest: "label",
+        labels: ["No", "", "", "", "",
+                  "Don't care", "", "", "", "",
+                  "Yes"]
+      })
+      .on("slidechange", function(e,ui) {
+        vibrantImportance = ui.value;
+        updateUi();
+      });
+  $("#park-slider")
+      .slider({ max: 1, min: 0, step: 0.1 })
+      .slider("pips", {
+        step: 5 ,
+        rest: "label",
+        labels: ["Not Important", "", "", "", "",
+                  "", "", "", "", "",
+                  "Very Important"]
+      })
+      .on("slidechange", function(e,ui) {
+        parkImportance = ui.value;
+        updateUi();
+      });
+  $("#playground-slider")
+      .slider({ max: 1, min: -1, step: 0.2 })
+      .slider("pips", {
+        step: 5 ,
+        rest: "label",
+        labels: ["Near", "", "", "", "",
+                  "Don't care", "", "", "", "",
+                  "Far Away"]
+      })
+      .on("slidechange", function(e,ui) {
+        playgroundImportance = ui.value;
+        updateUi();
+      });
+  $("#subway-slider")
+      .slider({ max: 1, min: 0, step: 0.1 })
+      .slider("pips", {
+        step: 5 ,
+        rest: "label",
+        labels: ["Not Important", "", "", "", "",
+                  "", "", "", "", "",
+                  "Very Important"]
+      })
+      .on("slidechange", function(e,ui) {
+        subwayImportance = ui.value;
+        updateUi();
+      });
+  $("#restaurant-slider")
+      .slider({ max: 1, min: 0, step: 0.1 })
+      .slider("pips", {
+        step: 5 ,
+        rest: "label",
+        labels: ["Not Important", "", "", "", "",
+                  "", "", "", "", "",
+                  "Very Important"]
+      })
+      .on("slidechange", function(e,ui) {
+        restaurant = ui.value;
+        updateUi();
+      });
 }
 
 function initializeSideNavs() {
@@ -453,35 +490,35 @@ function userQuestionDialogFinished() {
   var central = $('input[name=central]:checked').val();
 
   // Important Boroughs
-  preferredBrough["queens"] = $('#borough-queens').prop('checked');
-  preferredBrough["brooklyn"] = $('#borough-brooklyn').prop('checked');
-  preferredBrough["manhattan"] = $('#borough-manhattan').prop('checked');
-  preferredBrough["bronx"] = $('#borough-bronx').prop('checked');
-  preferredBrough["stateIsland"] = $('#borough-staten-island').prop('checked');
+  preferredBoroughs["queens"] = $('#borough-queens').prop('checked');
+  preferredBoroughs["brooklyn"] = $('#borough-brooklyn').prop('checked');
+  preferredBoroughs["manhattan"] = $('#borough-manhattan').prop('checked');
+  preferredBoroughs["bronx"] = $('#borough-bronx').prop('checked');
+  preferredBoroughs["statenIsland"] = $('#borough-staten-island').prop('checked');
 
-  $('#borough-queens-sidenav').prop('checked', preferredBrough["queens"]);
+  $('#borough-queens-sidenav').prop('checked', preferredBoroughs["queens"]);
   $('#borough-queens-sidenav').change(function() {
-    preferredBrough["queens"] = $(this).prop('checked');
+    preferredBoroughs["queens"] = $(this).prop('checked');
     updateUi();
   });
-  $('#borough-brooklyn-sidenav').prop('checked', preferredBrough["brooklyn"]);
+  $('#borough-brooklyn-sidenav').prop('checked', preferredBoroughs["brooklyn"]);
   $('#borough-brooklyn-sidenav').change(function() {
-    preferredBrough["brooklyn"] = $(this).prop('checked');
+    preferredBoroughs["brooklyn"] = $(this).prop('checked');
     updateUi();
   });
-  $('#borough-manhattan-sidenav').prop('checked', preferredBrough["manhattan"]);
+  $('#borough-manhattan-sidenav').prop('checked', preferredBoroughs["manhattan"]);
   $('#borough-manhattan-sidenav').change(function() {
-    preferredBrough["manhattan"] = $(this).prop('checked');
+    preferredBoroughs["manhattan"] = $(this).prop('checked');
     updateUi();
   });
-  $('#borough-bronx-sidenav').prop('checked', preferredBrough["bronx"]);
+  $('#borough-bronx-sidenav').prop('checked', preferredBoroughs["bronx"]);
   $('#borough-bronx-sidenav').change(function() {
-    preferredBrough["bronx"] = $(this).prop('checked');
+    preferredBoroughs["bronx"] = $(this).prop('checked');
     updateUi();
   });
-  $('#borough-staten-island-sidenav').prop('checked', preferredBrough["stateIsland"]);
+  $('#borough-staten-island-sidenav').prop('checked', preferredBoroughs["statenIsland"]);
   $('#borough-staten-island-sidenav').change(function() {
-    preferredBrough["stateIsland"] = $(this).prop('checked');
+    preferredBoroughs["statenIsland"] = $(this).prop('checked');
     updateUi();
   });
 
@@ -599,8 +636,6 @@ function queryRouteDistance() {
 }
 
 function updateUi() {
-  updateSliderValues();
-
   if (currentData) {
     weightGeoJson(currentData);
     updateResultList();
@@ -609,23 +644,6 @@ function updateUi() {
   if (currentLayer) {
     currentLayer.setStyle(style);
   }
-}
-
-function updateSliderValues() {
-  $('#are-range-label').html('Area (' + areaImportance + ')');
-  $('#center-range-label').html('Center (' + centerImportance + ')');
-  $('#university-range-label').html('University (' + universityImportance + ')');
-  $('#parking-range-label').html('Parking (' + parkingImportance + ')');
-  $('#school-range-label').html('School (' + schoolImportance + ')');
-  $('#rental-range-label').html('Rental (' + rentalImportance + ')');
-  $('#population-range-label').html('Population (' + populationImportance + ')');
-  $('#complaint-range-label').html('Complaint (' + complaintImportance + ')');
-  $('#playground-range-label').html('Playground (' + playgroundImportance + ')');
-  $('#park-range-label').html('Park (' + parkImportance + ')');
-  $('#soccerfield-range-label').html('Soccerfield (' + soccerfieldImportance + ')');
-  $('#restaurant-range-label').html('Restaurant (' + restaurantImportance + ')');
-  $('#subway-range-label').html('Subway (' + subwayImportance + ')');
-  $('#personal-distance-range-label').html('Personal Distance (' + personalDistanceImportance + ')');
 }
 
 function updateResultList() {
