@@ -70,10 +70,6 @@ var geocoder = L.mapbox.geocoder('mapbox.places');
 var currentData;
 var currentLayer;
 
-// Will be computed to find correct colors of sectors
-var maxValuation;
-var minValuation;
-
 // Hold user input values
 var centerImportance = 0;
 var universityImportance = 0;
@@ -140,12 +136,11 @@ function initializeSelectionMap() {
 };
 
 // Returns the color of a region based on the given rating value
-function getColor(valuation) {
-  var range = maxValuation - minValuation;
-
+function getColor(quantil) {
   // A 'relative' rating compared to all values.
-  // Will be in the range between 0.0 and 1.0
-  var relativeRating = (valuation - minValuation) / (range * 1.0);
+  // Use the 'quantil'/percentage position of the element (approximatly).
+  // Inverse the value: first element (0) should have the highest rating
+  var relativeRating = 1 - quantil;
 
   if (relativeRating > 0.8) return '#54d83a';
   if (relativeRating > 0.7) return '#86d83a';
@@ -161,7 +156,7 @@ function getColor(valuation) {
 // Returns the style for a region on the map
 function style(feature) {
   return {
-    fillColor: getColor(feature.valuation),
+    fillColor: getColor(feature.quantil),
     weight: 2,
     opacity: 1,
     color: 'white',
@@ -200,21 +195,14 @@ function weightGeoJson(geoJson) {
         || preferredBoroughs["statenIsland"] && feature.properties.boro_name == "Staten Island") {
       feature.valuation = (feature.valuation + 1) * preferredBoroughsWeight;
     }
-
-    // Keep minimum and maximum, useful to get good colors for the map
-    if (feature.valuation > maxValuation) {
-      maxValuation = feature.valuation;
-    }
-    if (feature.valuation < minValuation) {
-      minValuation = feature.valuation;
-    }
   });
 
   geoJson.features.sort(function (a, b) {
     return b.valuation - a.valuation;
   });
-  maxValuation = geoJson.features[0].valuation;
-  minValuation = geoJson.features[geoJson.features.length - 1].valuation;
+  for (var i = 0; i < geoJson.features.length; i++) {
+    geoJson.features[i].quantil = i / geoJson.features.length;
+  }
 
   return geoJson;
 }
