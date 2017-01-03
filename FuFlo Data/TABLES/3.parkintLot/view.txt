@@ -1,5 +1,0 @@
-CREATE VIEW parkinglotarea AS
- SELECT a.ntacode, (pl.total::FLOAT / (SELECT MAX(total)::FLOAT FROM parking_lots_per_region)) AS Total
- FROM areas a
- LEFT JOIN parking_lots_per_region pl
- ON (a.ntacode = pl.ntacode);

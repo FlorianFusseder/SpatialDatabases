@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset=utf-8 />
+    <title>Move to NY</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+
+    <!-- External Imports/Libraries -->
+    <script src='https://api.mapbox.com/mapbox.js/v3.0.1/mapbox.js'></script>
+    <link href='https://api.mapbox.com/mapbox.js/v3.0.1/mapbox.css' rel='stylesheet' />
+
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script
+        src="http://code.jquery.com/ui/1.11.4/jquery-ui.min.js"
+        integrity="sha256-xNjb53/rY+WmG+4L6tTl9m6PpqknWZvRt0rO1SRnJzw="
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/ui-darkness/jquery-ui.css" />
+
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.6/semantic.min.js"></script>
+    <link rel="stylesheet" media="screen" href="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.6/semantic.min.css">
+
+    <script src="//cdn.jsdelivr.net/bluebird/3.4.7/bluebird.min.js"></script>
+
+    <script src='./jquery-ui-slider-pips.js'></script>
+    <link href='./jquery-ui-slider-pips.css' rel='stylesheet' />
+
+    <script src='./range.js'></script>
+    <link href='./range.css' rel='stylesheet' />
+
+    <!-- Internal Imports -->
+    <link href='./style.css' rel='stylesheet'/>
+  </head>
+  <body>
+    <!-- Main Content (Map with side panels) -->
+    <div class="fullscreen flex-container">
+      <!-- Left Nav: Contains selection Sliders -->
+      <div id="left-nav">
+        <i class="top-right big search icon" id="toggle-left-nav"></i>
+
+        <div class="nav-content">
+          <h2>Refine Search</h2>
+          <div class="ui vertical segment">
+            <p>How important are short distances to your locations of interest?</p>
+            <div class="slider-container">
+              <div id="personal-distance-slider" class="slider"></div>
+            </div>
+          </div>
+          <div class="ui vertical segment">
+            <p>Do you want to live in the center of NY or outside?</p>
+            <div class="slider-container">
+              <div id="central-slider" class="slider"></div>
+            </div>
+          </div>
+          <div class="ui vertical segment">
+            <p>Do you want to live near a university?</p>
+            <div class="slider-container">
+              <div id="university-slider" class="slider"></div>
+            </div>
+          </div>
+          <div class="ui vertical segment">
+            <p>How important is the parking situation for you?</p>
+            <div class="slider-container">
+              <div id="parking-slider" class="slider"></div>
+            </div>
+          </div>
+          <div class="ui vertical segment">
+            <p>Do you want to live near schools?</p>
+            <div class="slider-container">
+              <div id="school-slider" class="slider"></div>
+            </div>
+          </div>
+          <div class="ui vertical segment">
+            <p>How important are cheap rental prices for you?</p>
+            <div class="slider-container">
+              <div id="rental-slider" class="slider"></div>
+            </div>
+          </div>
+          <div class="ui vertical segment">
+            <p>Do you want to live in a vibrant area?</p>
+            <div class="slider-container">
+              <div id="vibrant-slider" class="slider"></div>
+            </div>
+          </div>
+          <div class="ui vertical segment">
+            <p>How important are parks and recreational areas for you?</p>
+            <div class="slider-container">
+              <div id="park-slider" class="slider"></div>
+            </div>
+          </div>
+          <div class="ui vertical segment">
+            <p>Do you want to live near play areas?</p>
+            <div class="slider-container">
+              <div id="playground-slider" class="slider"></div>
+            </div>
+          </div>
+          <div class="ui vertical segment">
+            <p>How important is the subway for you?</p>
+            <div class="slider-container">
+              <div id="subway-slider" class="slider"></div>
+            </div>
+          </div>
+          <div class="ui vertical segment">
+            <p>How important is it that there are restaurants around?</p>
+            <div class="slider-container">
+              <div id="restaurant-slider" class="slider"></div>
+            </div>
+          </div>
+
+          <h3>Do you have specific boroughs that you want to live in?</h3> <!-- Preffered Boroughs -->
+          <div class="ui vertical segment">
+            <div class="inline field">
+              <div class="ui checkbox">
+                <input type="checkbox" tabindex="0" class="hidden" id="borough-queens-sidenav">
+                <label>Queens</label>
+              </div>
+            </div>
+          </div>
+          <div class="ui vertical segment">
+            <div class="inline field">
+              <div class="ui checkbox">
+                <input type="checkbox" tabindex="0" class="hidden" id="borough-brooklyn-sidenav">
+                <label>Brooklyn</label>
+              </div>
+            </div>
+          </div>
+          <div class="ui vertical segment">
+            <div class="inline field">
+              <div class="ui checkbox">
+                <input type="checkbox" tabindex="0" class="hidden" id="borough-manhattan-sidenav">
+                <label>Manhattan</label>
+              </div>
+            </div>
+          </div>
+          <div class="ui vertical segment">
+            <div class="inline field">
+              <div class="ui checkbox">
+                <input type="checkbox" tabindex="0" class="hidden" id="borough-bronx-sidenav">
+                <label>Bronx</label>
+              </div>
+            </div>
+          </div>
+          <div class="ui vertical segment">
+            <div class="inline field">
+              <div class="ui checkbox">
+                <input type="checkbox" tabindex="0" class="hidden" id="borough-staten-island-sidenav">
+                <label>Staten Island</label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main map area -->
+      <div id="map">
+
+      </div>
+
+      <!-- Right Nav: Contains search results -->
+      <div id="right-nav">
+        <i class="top-left big tasks icon" id="toggle-right-nav"></i>
+
+        <div class="nav-content" id="right-nav-content">
+          <h2>Results</h2>
+          <div class="ui cards" id="result-list"></div>
+        </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Initial Selection Screen -->
+    <div class="fullscreen new-york-background" style="z-index: 99999;" id="input-view">
+      <div class="ui container light-padding fill-parent" style="overflow: hidden;">
+        <div class="ui segment fill-parent center aligned ">
+          <!-- Header Area -->
+          <h1 class="ui header">
+            Move to New York
+          </h1>
+          <h2>Find your perfect spot in New York City</h2>
+
+          <!-- Step Indicators -->
+          <div class="ui three ordered steps">
+            <div class="active step" id="first-step-indicator">
+              <div class="content">
+                <div class="title">General Info</div>
+                <div class="description">General Info about you</div>
+              </div>
+            </div>
+            <div class="step" id="second-step-indicator">
+              <div class="content">
+                <div class="title">Locations of Interest</div>
+                <div class="description">Enter your daily route</div>
+              </div>
+            </div>
+            <div class="step" id="third-step-indicator">
+              <div class="content">
+                <div class="title">Finished</div>
+                <div class="description">View the results of your search</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- First Step: General Questions -->
+          <div class="ui segment left aligned" id="first-step">
+            <div class="ui form">
+              <h3>How old are you?</h3> <!-- Age Selection -->
+              <div class="inline fields">
+                <div class="field">
+                  <div class="ui radio checkbox">
+                    <input type="radio" name="age" checked="" tabindex="0" class="hidden" value="under25">
+                    <label>under 25</label>
+                  </div>
+                </div>
+                <div class="field">
+                  <div class="ui radio checkbox">
+                    <input type="radio" name="age" tabindex="0" class="hidden" value="25to35">
+                    <label>25 to 35</label>
+                  </div>
+                </div>
+                <div class="field">
+                  <div class="ui radio checkbox">
+                    <input type="radio" name="age" tabindex="0" class="hidden" value="36to50">
+                    <label>36 to 50</label>
+                  </div>
+                </div>
+                <div class="field">
+                  <div class="ui radio checkbox">
+                    <input type="radio" name="age" tabindex="0" class="hidden" value="over50">
+                    <label>over 50</label>
+                  </div>
+                </div>
+              </div>
+
+              <h3>Please answer the following questions</h3> <!-- General Questions -->
+              <div class="ui grid">
+                <div class="eight wide column">
+                  <div class="inline field">
+                    <div class="ui checkbox">
+                      <input type="checkbox" tabindex="0" class="hidden" id="has-children">
+                      <label>Do you have children?</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="eight wide column">
+                  <div class="inline field">
+                    <div class="ui checkbox">
+                      <input type="checkbox" tabindex="0" class="hidden" id="is-student">
+                      <label>Are you a student</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="eight wide column">
+                  <div class="inline field">
+                    <div class="ui checkbox">
+                      <input type="checkbox" tabindex="0" class="hidden" id="has-car">
+                      <label>Do you own a car?</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="eight wide column">
+                  <div class="inline field">
+                    <div class="ui checkbox">
+                      <input type="checkbox" tabindex="0" class="hidden" id="has-dog">
+                      <label>Do you have a dog?</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="eight wide column">
+                  <div class="inline field">
+                    <div class="ui checkbox">
+                      <input type="checkbox" tabindex="0" class="hidden" id="does-sport">
+                      <label>Do you do outdoor sports?</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="eight wide column">
+                  <div class="inline field">
+                    <div class="ui checkbox">
+                      <input type="checkbox" tabindex="0" class="hidden" id="use-subway">
+                      <label>Do you use the subway often?</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="eight wide column">
+                  <div class="inline field">
+                    <div class="ui checkbox">
+                      <input type="checkbox" tabindex="0" class="hidden" id="likes-nature">
+                      <label>Do you like nature?</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <h3>Do you prefer an quiet or an vibrant area?</h3> <!-- Vibrant vs. Quiet -->
+              <div class="ui equal width grid">
+                <div class="column inline field">
+                  <div class="ui radio checkbox">
+                    <input type="radio" name="vibrant" checked="" tabindex="0" class="hidden" value="quiet">
+                    <label>I prefer quiet areas</label>
+                  </div>
+                </div>
+                <div class="column inline field">
+                  <div class="ui radio checkbox">
+                    <input type="radio" name="vibrant" tabindex="0" class="hidden" value="dontCare" checked>
+                    <label>I don't care</label>
+                  </div>
+                </div>
+                <div class="column inline field">
+                  <div class="ui radio checkbox">
+                    <input type="radio" name="vibrant" tabindex="0" class="hidden" value="vibrant">
+                    <label>I like vibrant areas</label>
+                  </div>
+                </div>
+              </div>
+
+              <h3>How important are rental prices for you?</h3> <!-- Price -->
+              <div class="ui equal width grid">
+                <div class="column inline field">
+                  <div class="ui radio checkbox">
+                    <input type="radio" name="price" checked="" tabindex="0" class="hidden" value="veryCheap">
+                    <label>Money is a big concern</label>
+                  </div>
+                </div>
+                <div class="column inline field">
+                  <div class="ui radio checkbox">
+                    <input type="radio" name="price" tabindex="0" class="hidden" value="cheap" checked>
+                    <label>It should not be overly expensive</label>
+                  </div>
+                </div>
+                <div class="column inline field">
+                  <div class="ui radio checkbox">
+                    <input type="radio" name="price" tabindex="0" class="hidden" value="dontCare">
+                    <label>Money is no problem</label>
+                  </div>
+                </div>
+              </div>
+
+              <h3>Do you want to live near the city center?</h3> <!-- Central -->
+              <div class="ui equal width grid">
+                <div class="column inline field">
+                  <div class="ui radio checkbox">
+                    <input type="radio" name="central" checked="" tabindex="0" class="hidden" value="away">
+                    <label>I prefer to live away from the center</label>
+                  </div>
+                </div>
+                <div class="column inline field">
+                  <div class="ui radio checkbox">
+                    <input type="radio" name="central" tabindex="0" class="hidden" value="dontCare" checked>
+                    <label>I don't care</label>
+                  </div>
+                </div>
+                <div class="column inline field">
+                  <div class="ui radio checkbox">
+                    <input type="radio" name="central" tabindex="0" class="hidden" value="central">
+                    <label>I prefer to live central</label>
+                  </div>
+                </div>
+              </div>
+
+              <h3>Do you have specific boroughs that you want to live in?</h3> <!-- Preffered Boroughs -->
+              <div class="ui grid">
+                <div class="eight wide column">
+                  <div class="inline field">
+                    <div class="ui checkbox">
+                      <input type="checkbox" tabindex="0" class="hidden" id="borough-queens">
+                      <label>Queens</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="eight wide column">
+                  <div class="inline field">
+                    <div class="ui checkbox">
+                      <input type="checkbox" tabindex="0" class="hidden" id="borough-brooklyn">
+                      <label>Brooklyn</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="eight wide column">
+                  <div class="inline field">
+                    <div class="ui checkbox">
+                      <input type="checkbox" tabindex="0" class="hidden" id="borough-manhattan">
+                      <label>Manhattan</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="eight wide column">
+                  <div class="inline field">
+                    <div class="ui checkbox">
+                      <input type="checkbox" tabindex="0" class="hidden" id="borough-bronx">
+                      <label>Bronx</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="eight wide column">
+                  <div class="inline field">
+                    <div class="ui checkbox">
+                      <input type="checkbox" tabindex="0" class="hidden" id="borough-staten-island">
+                      <label>Staten Island</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <br/>
+
+              <div class="ui submit button" id="finish-first-step">Next Step</div>
+            </div>
+          </div>
+
+          <!-- Second Step: Ask for a typical day (places that the person visits often) -->
+          <div class="ui segment left aligned" id="second-step" hidden>
+            <h3>Locations of Interest</h3>
+            <div class="ui grid">
+              <div class="eight wide column">
+                <p>
+                  Let us know what places you usually visit during a day.
+                  This will help us to search a place that is not too far from your daily visited places.
+                </p>
+                <div class="ui form">
+                  <div class="field">
+                    <label>You start your day home.</label>
+                    <input type="text" value="Home" disabled=""/>
+                  </div>
+
+                  <div class="field">
+                    <label>Then you visit these places.</label>
+                    <div id="route-inputs">
+
+                    </div>
+                  </div>
+
+                  <div class="field">
+                    <button class="ui green button" id="add-place">Add Place</button>
+                  </div>
+
+                  <div class="field">
+                    <label>After a long day you head back home.</label>
+                    <input type="text" value="Home" disabled=""/>
+                  </div>
+
+                  <div class="ui submit button" id="finish-second-step">Next Step</div>
+
+                </div>
+              </div>
+              <div class="eight wide column">
+                <div id="selection-map">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Third Step: Loading Indicator -->
+          <div class="ui segment left aligned" id="third-step" style="padding: 100px;" hidden>
+            <div class="ui active dimmer">
+              <div class="ui text loader">Searching...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Run our programme -->
+    <script src="./script.js"></script>
+  </body>
+</html>
