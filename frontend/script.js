@@ -82,8 +82,6 @@ var schoolImportance = 0;
 var rentalImportance = 0;
 var vibrantImportance = 0;
 var parkImportance = 0;
-var populationImportance = 0;
-var complaintImportance = 0;
 var playgroundImportance = 0;
 var restaurantImportance = 0;
 var subwayImportance = 0;
@@ -787,8 +785,9 @@ function userQuestionDialogFinished() {
     return element.data.geometry.coordinates;
   });
   selectedPlaces.forEach(function(coordinate, index) {
-    L.marker(coordinate, {
-      icon:	new L.NumberedDivIcon({number: '' + (index + 1)}),
+    var icon = new L.NumberedDivIcon({number: '' + (index + 1)});
+    L.marker([coordinate[1], coordinate[0]], {
+      icon:	icon,
     }).addTo(map);
   });
 
