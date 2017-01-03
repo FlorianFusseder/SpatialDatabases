@@ -1,0 +1,5 @@
+To import the data execute the following command with corrected paths.
+
+psql spt-project < path/to/backup
+
+spt-project is the name of the database that you want to import the data into.

@@ -15,6 +15,12 @@ To do so skip over the following sections and go directly to 'Quick Setup'.
 To setup the database you will import an dump of our postgres database.
 This will add all datasets that we have imported to your postgres database.
 
+To import the data execute the following command with corrected paths.
+
+`psql spt-project < path/to/backup`
+
+spt-project is the name of the database that you want to import the data into.
+
 The data is then composed in views to be presented in a consistent form to geoserver.
 See the setup_data_views.sql file for the general structure of the data views and how
 they are composed to the final view that is presented to geoserver.
@@ -34,7 +40,6 @@ Start with a default geo server installation and follew the next steps:
 - Create the layer
   - After connecting to the database you will see an view with the avaliable tabels/views
   - Publish the area_ratings view/table
-- TODO: Read about caching
 
 ## Setup WebServer
 

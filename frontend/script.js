@@ -102,6 +102,10 @@ var cardsForFeatures;
 // Load our data
 $.get(dataSource)
     .done(function (data) {
+      if (typeof  data == "string") {
+        data = JSON.parse(data);
+      }
+
       currentData = data;
       currentLayer = L.geoJson(currentData, { style: style, onEachFeature: onEachFeature });
       currentLayer.addTo(map);
@@ -240,7 +244,7 @@ function restaurantValuation(feature) {
   var restaurantRating = feature.properties.restaurant_rating;
 
   // Custom weighting -> how important is personal distance in general?
-  var weighting = 1;
+  var weighting = 0.5;
 
   return  restaurantRating * restaurantImportance * weighting || 0;
 }
@@ -277,6 +281,14 @@ function parkValuation(feature) {
 
   // Custom weighting -> how important is personal distance in general?
   var weighting = 2;
+
+  if (parkRating > 0.2) {
+    parkRating *= 2;
+  }
+  if (parkRating > 1) {
+    parkRating = 1;
+  }
+
 
   return  parkRating * parkImportance * weighting || 0;
 }
