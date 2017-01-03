@@ -31,7 +31,7 @@ restaurant_count int,
 rating double precision
 );
 
-COPY restaurant_rating FROM '/Users/florianfritz/Desktop/data/restaurants/restaurants_table.txt' DELIMITER ';' CSV HEADER;
+COPY restaurant_rating FROM '/Users/florianfritz/Desktop/data/restaurants/restaurants_table2.txt' DELIMITER ';' CSV HEADER;
 SELECT * FROM restaurant_rating;
 
 /** Soccerfields **/
