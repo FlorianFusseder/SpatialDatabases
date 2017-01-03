@@ -87,7 +87,7 @@ var complaintImportance = 0;
 var playgroundImportance = 0;
 var restaurantImportance = 0;
 var subwayImportance = 0;
-var personalDistanceImportance = 5;
+var personalDistanceImportance = 0;
 
 var preferredBoroughs = [];
 preferredBoroughs["queens"] = false;
@@ -180,6 +180,8 @@ function weightGeoJson(geoJson) {
   geoJson.features.forEach(function (feature) {
     feature.valuation = 0;
 
+    feature.valuation += personalDistanceValuation(feature);
+    feature.valuation += vibrantValuation(feature);
     feature.valuation += centerDistanceValuation(feature);
     feature.valuation += universityValuation(feature);
     feature.valuation += parkingValuation(feature);
@@ -187,18 +189,24 @@ function weightGeoJson(geoJson) {
     feature.valuation += rentalValuation(feature);
     feature.valuation += parkingValuation(feature);
     feature.valuation += parkValuation(feature);
-    feature.valuation += playgroundValuation(feature);
-    feature.valuation += restaurantValuation(feature);
+    feature.valuation += playareaValuation(feature);
     feature.valuation += subwayValuation(feature);
-    feature.valuation += personalDistanceValuation(feature);
+    feature.valuation += restaurantValuation(feature);
+    feature.valuation += complaintValuation(feature);
 
+    // Bonus for preferred regions
     var preferredBoroughsWeight = 3;
     if (preferredBoroughs["queens"] && feature.properties.boro_name == "Queens"
         || preferredBoroughs["brooklyn"] && feature.properties.boro_name == "Brooklyn"
         || preferredBoroughs["manhattan"] && feature.properties.boro_name == "Manhattan"
         || preferredBoroughs["bronx"] && feature.properties.boro_name == "Bronx"
         || preferredBoroughs["statenIsland"] && feature.properties.boro_name == "Staten Island") {
-      feature.valuation = (feature.valuation + 1) * preferredBoroughsWeight;
+
+      if (feature.valuation > 0) {
+        feature.valuation *= preferredBoroughsWeight;
+      } else {
+        feature.valuation /= preferredBoroughsWeight;
+      }
     }
 
     // Keep minimum and maximum, useful to get good colors for the map
@@ -221,36 +229,135 @@ function weightGeoJson(geoJson) {
 
 // Values a given feature by using an algorithm.
 // Returns positive or negative values based on how good this given feature is.
-function centerDistanceValuation(feature) {
-  // Its better to be close to the center, so value it negative
-  return 1 + feature.properties.center_rating * centerImportance * -1 || 0;
+function complaintValuation(feature) {
+  var complaintRating = 1 - feature.properties.complaint_rating;
+
+  // Custom weighting -> how important is personal distance in general?
+  var weighting = 0.25;
+
+  return complaintRating * weighting || 0;
 }
-function universityValuation(feature) {
-  return 1 + feature.properties.university_rating * universityImportance || 0;
-}
-function parkingValuation(feature) {
-  return 1 + feature.properties.parking_rating * parkingImportance || 0;
-}
-function schoolValuation(feature) {
-  return 1 + feature.properties.school_rating * schoolImportance || 0;
-}
-function rentalValuation(feature) {
-  return 1 + feature.properties.rental_rating * rentalImportance * - 1 || 0;
-}
-function parkValuation(feature) {
-  return 1 + feature.properties.park_ratings * parkImportance || 0;
-}
-function playgroundValuation(feature) {
-  return 1 + feature.properties.playground_ratings * playgroundImportance || 0;
-}
+
 function restaurantValuation(feature) {
-  return 1 + feature.properties.restaurant_rating * restaurantImportance || 0;
+  var restaurantRating = feature.properties.restaurant_rating;
+
+  // Custom weighting -> how important is personal distance in general?
+  var weighting = 1;
+
+  return  restaurantRating * restaurantImportance * weighting || 0;
 }
+
 function subwayValuation(feature) {
-  return 1 + feature.properties.subway_rating * subwayImportance || 0;
+  // Distance to next subway -> 1 is good, 0 is no subay station
+  var subwayRating = feature.properties.subway_rating;
+
+  // No subway station in region, special calculation
+  if (subwayRating < 1) {
+    subwayRating = (subwayRating * subwayRating * subwayRating) / 3;
+  }
+
+  // Custom weighting -> how important is personal distance in general?
+  var weighting = 1.5;
+
+  return subwayRating * subwayImportance * weighting || 0;
 }
+
+function playareaValuation(feature) {
+  var playgroundRating = feature.properties.playground_ratings;
+  var soccerRating = feature.properties.soccerfields_rating;
+
+  var playareaRating = (playgroundRating * 3 + soccerRating) / 4;
+
+  // Custom weighting -> how important is personal distance in general?
+  var weighting = 1;
+
+  return playareaRating * playgroundImportance * weighting || 0;
+}
+
+function parkValuation(feature) {
+  var parkRating = feature.properties.park_ratings;
+
+  // Custom weighting -> how important is personal distance in general?
+  var weighting = 2;
+
+  return  parkRating * parkImportance * weighting || 0;
+}
+
+function vibrantValuation(feature) {
+  var restaurantRating = feature.properties.restaurant_rating;
+  var populationRating = feature.properties.population_rating;
+
+  var vibrantRating = (restaurantRating * 2 + populationRating) / 3;
+
+  // Custom weighting -> how important is personal distance in general?
+  var weighting = 1;
+
+  return vibrantRating * vibrantImportance * weighting || 0;
+}
+
+function rentalValuation(feature) {
+  // Invert value -> lowest prices should give positive rating
+  var rentalRating = 1 - feature.properties.rental_rating;
+
+  // Custom weighting -> how important is personal distance in general?
+  var weighting = 5;
+
+  return rentalRating * rentalImportance * rentalImportance * weighting || 0;
+}
+
+function schoolValuation(feature) {
+  var schoolRating = feature.properties.school_rating;
+
+  // Custom weighting -> how important is personal distance in general?
+  var weighting = 1;
+
+  return schoolRating * schoolImportance * weighting || 0;
+}
+
+function parkingValuation(feature) {
+  var parkingRating = feature.properties.parking_rating;
+
+  // Custom weighting -> how important is personal distance in general?
+  var weighting = 0.6;
+
+  return parkingRating * parkingImportance * weighting|| 0;
+}
+
+function universityValuation(feature) {
+  var universityRating = feature.properties.university_rating;
+
+  // Custom weighting -> how important is personal distance in general?
+  var weighting = 1;
+
+  return  universityRating * universityImportance * weighting|| 0;
+}
+
+function centerDistanceValuation(feature) {
+  // Distance to location of interest
+  // Normalised between 0 and 1
+  var centerDistance = feature.properties.center_rating;
+
+  // Inverse value -> 1 is best (closer is better)
+  var rating = (1 - centerDistance);
+
+  // Custom weighting -> how important is personal distance in general?
+  var weighting = 1;
+
+  return rating * centerImportance * weighting|| 0;
+}
+
 function personalDistanceValuation(feature) {
-  return 1 + feature.properties.personalDistance * personalDistanceImportance * -1 || 0;
+  // Distance to location of interest
+  // Normalised between 0 and 1
+  var personalDistance = feature.properties.personalDistance;
+
+  // Inverse value -> 1 is best
+  var rating = (1 - personalDistance);
+
+  // Custom weighting -> how important is personal distance in general?
+  var weighting = 2.5;
+
+  return rating * personalDistanceImportance * weighting || 0;
 }
 // TODO: Add proper valuation functions for different feature aspects
 
@@ -329,9 +436,9 @@ function initializeSliders() {
       .slider("pips", {
         step: 5 ,
         rest: "label",
-        labels: ["Near", "", "", "", "",
+        labels: ["Far Away", "", "", "", "",
                   "Don't care", "", "", "", "",
-                  "Far Away"]
+                  "Near"]
       })
       .on("slidechange", function(e,ui) {
         universityImportance = ui.value;
@@ -355,9 +462,9 @@ function initializeSliders() {
       .slider("pips", {
         step: 5 ,
         rest: "label",
-        labels: ["Near", "", "", "", "",
+        labels: ["Far Away", "", "", "", "",
                   "Don't care", "", "", "", "",
-                  "Far Away"]
+                  "Near"]
       })
       .on("slidechange", function(e,ui) {
         schoolImportance = ui.value;
@@ -407,9 +514,9 @@ function initializeSliders() {
       .slider("pips", {
         step: 5 ,
         rest: "label",
-        labels: ["Near", "", "", "", "",
+        labels: ["Far Away", "", "", "", "",
                   "Don't care", "", "", "", "",
-                  "Far Away"]
+                  "Near"]
       })
       .on("slidechange", function(e,ui) {
         playgroundImportance = ui.value;
@@ -438,7 +545,7 @@ function initializeSliders() {
                   "Very Important"]
       })
       .on("slidechange", function(e,ui) {
-        restaurant = ui.value;
+        restaurantImportance = ui.value;
         updateUi();
       });
 }
@@ -468,25 +575,26 @@ function initializeSideNavs() {
 // Called when the user finished the second step of the initial questions.
 // Use this to predefine the slider values and to query additional data.
 function userQuestionDialogFinished() {
-  // Age, under 25 (0), 25-35 (1), 36-50
+  // Age
   var age = $('input[name=age]:checked').val();
 
   // General Questions
   var hasChildren     = $('#has-children').prop('checked');
   var isStudent       = $('#is-student').prop('checked');
   var hasCar          = $('#has-car').prop('checked');
+  var hasDog          = $('#has-dog').prop('checked');
   var doesSport       = $('#does-sport').prop('checked');
   var usesSubway      = $('#use-subway').prop('checked');
   var likesNature     = $('#likes-nature').prop('checked');
 
-  // Quiet or vibrant, quiet (0), don't care (1), vibrant (2)
+  // Quiet or vibrant
   var vibrant = $('input[name=vibrant]:checked').val();
 
   // Price,
   // low price is very important (0), low price is a little important (1), price is not important at all (2)
   var price = $('input[name=price]:checked').val();
 
-  // Central, outside (0), don't care (1), central (2)
+  // Central
   var central = $('input[name=central]:checked').val();
 
   // Important Boroughs
@@ -522,7 +630,150 @@ function userQuestionDialogFinished() {
     updateUi();
   });
 
-  // TODO: Pre-Weight sliders
+  // Weight Personal Distance
+  personalDistanceImportance = 0.4;
+  if (hasCar) {
+    personalDistanceImportance -= 0.15;
+  }
+  if (hasChildren) {
+    personalDistanceImportance += 0.15;
+  }
+  if (!hasCar & !usesSubway) {
+    personalDistanceImportance += 0.25;
+  }
+  if (age == "over50") {
+    personalDistanceImportance += 0.1;
+  }
+  $('#personal-distance-slider').slider('value', personalDistanceImportance);
+
+  // Central
+  switch (central) {
+    case "away":
+      centerImportance = -0.6;
+      break;
+    case "central":
+      centerImportance = 0.6;
+      break;
+    default:
+      centerImportance = 0;
+  }
+  $('#central-slider').slider('value', centerImportance);
+
+  // University
+  universityImportance = 0;
+  if (isStudent) {
+    if (hasCar) {
+      universityImportance += 0.6;
+    } else {
+      universityImportance += 0.8;
+    }
+  }
+  if (age == "under25" || age == "25to35") {
+    universityImportance += 0.1;
+  }
+  $('#university-slider').slider('value', universityImportance);
+
+  // Parking
+  parkingImportance = hasCar ? 0.8 : 0;
+  $('#parking-slider').slider('value', parkingImportance);
+
+  // School
+  schoolImportance = 0;
+  if (hasChildren) {
+    schoolImportance += 0.8;
+  }
+  if (vibrant == "quiet") {
+    schoolImportance -= 0.2;
+  }
+  $('#school-slider').slider('value', schoolImportance);
+
+  // Rental Prices
+  switch (price) {
+    case "veryCheap":
+      rentalImportance = 1;
+      break;
+    case "cheap":
+      rentalImportance = 0.6;
+      break;
+    default:
+      rentalImportance = 0.1;
+  }
+  $('#rental-slider').slider('value', rentalImportance);
+
+  // Vibrant
+  switch (vibrant) {
+    case "quiet":
+      vibrantImportance = -0.8;
+      break;
+    case "vibrant":
+      vibrantImportance = 0.8;
+      break;
+    default:
+      vibrantImportance = 0;
+  }
+  $('#vibrant-slider').slider('value', vibrantImportance);
+
+  // Parks
+  parkImportance = 0;
+  if (hasDog) {
+    parkImportance += 0.2;
+  }
+  if (doesSport) {
+    parkImportance += 0.4;
+  }
+  if (likesNature) {
+    parkImportance += 0.6;
+  }
+  if (hasChildren) {
+    parkImportance += 0.2;
+  }
+
+  if (parkImportance > 1) {
+    parkImportance = 1;
+  }
+
+  $('#park-slider').slider('value', parkImportance);
+
+  // PlayAreas
+  playgroundImportance = 0;
+  if (hasChildren) {
+    playgroundImportance = 0.8;
+  }
+  if (vibrant == "quiet") {
+    playgroundImportance -= 0.2;
+  }
+  $('#playground-slider').slider('value', playgroundImportance);
+
+  // Subway
+  subwayImportance = 0;
+  if (usesSubway) {
+    subwayImportance += 0.6;
+  }
+  if (!hasCar) {
+    subwayImportance += 0.2;
+  }
+  $('#subway-slider').slider('value', subwayImportance);
+
+  // Restaurants
+  restaurantImportance = 0;
+  if (vibrant == "vibrant") {
+    restaurantImportance += 0.4;
+  }
+  if (price == "dontCare") {
+    restaurantImportance += 0.2;
+  } else {
+    restaurantImportance -= 0.2;
+  }
+
+  if (restaurantImportance < 0){
+    restaurantImportance = 0;
+  }
+
+  $('#restaurant-slider').slider('value', restaurantImportance);
+
+
+
+
 
 
   // Apply our preselection to the data
@@ -534,6 +785,11 @@ function userQuestionDialogFinished() {
   });
   selectedPlaces = selectedPlaces.map(function(element) {
     return element.data.geometry.coordinates;
+  });
+  selectedPlaces.forEach(function(coordinate, index) {
+    L.marker(coordinate, {
+      icon:	new L.NumberedDivIcon({number: '' + (index + 1)}),
+    }).addTo(map);
   });
 
   // Only query the server for distances if the user entered his daily route
@@ -740,42 +996,43 @@ function onEachFeature(feature, layer) {
 ////////////////////////////////////
 // Second Question Pane - Users Important Places
 ////////////////////////////////////
+
+// Source: https://gist.github.com/comp615/2288108
+// Displays a marker with a number in it
+L.NumberedDivIcon = L.Icon.extend({
+  options: {
+    iconUrl: 'http://www.charliecroom.com/marker_hole.png',
+    number: '',
+    shadowUrl: null,
+    iconSize: new L.Point(25, 41),
+    iconAnchor: new L.Point(13, 41),
+    popupAnchor: new L.Point(0, -33),
+    /*
+     iconAnchor: (Point)
+     popupAnchor: (Point)
+     */
+    className: 'leaflet-div-icon'
+  },
+
+  createIcon: function () {
+    var div = document.createElement('div');
+    var img = this._createImg(this.options['iconUrl']);
+    var numdiv = document.createElement('div');
+    numdiv.setAttribute ( "class", "number" );
+    numdiv.innerHTML = this.options['number'] || '';
+    div.appendChild ( img );
+    div.appendChild ( numdiv );
+    this._setIconStyles(div, 'icon');
+    return div;
+  },
+
+  //you could change this to add a shadow like in the normal marker if you really wanted
+  createShadow: function () {
+    return null;
+  }
+});
+
 function initRouteInput() {
-  // Source: https://gist.github.com/comp615/2288108
-  // Displays a marker with a number in it
-  L.NumberedDivIcon = L.Icon.extend({
-    options: {
-      iconUrl: 'http://www.charliecroom.com/marker_hole.png',
-      number: '',
-      shadowUrl: null,
-      iconSize: new L.Point(25, 41),
-      iconAnchor: new L.Point(13, 41),
-      popupAnchor: new L.Point(0, -33),
-      /*
-       iconAnchor: (Point)
-       popupAnchor: (Point)
-       */
-      className: 'leaflet-div-icon'
-    },
-
-    createIcon: function () {
-      var div = document.createElement('div');
-      var img = this._createImg(this.options['iconUrl']);
-      var numdiv = document.createElement('div');
-      numdiv.setAttribute ( "class", "number" );
-      numdiv.innerHTML = this.options['number'] || '';
-      div.appendChild ( img );
-      div.appendChild ( numdiv );
-      this._setIconStyles(div, 'icon');
-      return div;
-    },
-
-    //you could change this to add a shadow like in the normal marker if you really wanted
-    createShadow: function () {
-      return null;
-    }
-  });
-
   // The Html used for a single input field to search places
   var nodeHtml =
       '<div class="two fields">' +

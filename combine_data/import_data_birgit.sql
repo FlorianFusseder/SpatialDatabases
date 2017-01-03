@@ -8,7 +8,7 @@ park_area double precision,
 rating double precision
 );
 
-COPY park_ratings FROM '/Users/florianfritz/Desktop/data/parks/neighbourhood_parks_table.txt' DELIMITER ';' CSV HEADER;
+COPY park_ratings FROM '/Users/florianfritz/Desktop/data/parks/neighbourhood_parks_table2.txt' DELIMITER ';' CSV HEADER;
 SELECT * FROM park_ratings;
 
 /** Playgrounds **/
@@ -16,10 +16,11 @@ create table playground_ratings
 (
 gid int,
 playground_count int,
+area double precision,
 rating double precision
 );
 
-COPY playground_ratings FROM '/Users/florianfritz/Desktop/data/playgrounds/neighbourhood_playground_table.txt' DELIMITER ';' CSV HEADER;
+COPY playground_ratings FROM '/Users/florianfritz/Desktop/data/playgrounds/neighbourhood_playground_table2.txt' DELIMITER ';' CSV HEADER;
 SELECT * FROM playground_ratings;
 
 /** Resturants **/
