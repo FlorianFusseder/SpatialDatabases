@@ -234,7 +234,7 @@ function weightGeoJson(geoJson) {
 function complaintValuation(feature) {
   var complaintRating = 1 - feature.properties.complaint_rating;
 
-  // Custom weighting -> how important is personal distance in general?
+  // Custom weighting -> how important is this rating?
   var weighting = 0.25;
 
   return complaintRating * weighting || 0;
@@ -243,7 +243,7 @@ function complaintValuation(feature) {
 function restaurantValuation(feature) {
   var restaurantRating = feature.properties.restaurant_rating;
 
-  // Custom weighting -> how important is personal distance in general?
+  // Custom weighting -> how important is this rating?
   var weighting = 0.5;
 
   return  restaurantRating * restaurantImportance * weighting || 0;
@@ -258,7 +258,7 @@ function subwayValuation(feature) {
     subwayRating = (subwayRating * subwayRating * subwayRating) / 3;
   }
 
-  // Custom weighting -> how important is personal distance in general?
+  // Custom weighting -> how important is this rating?
   var weighting = 1.5;
 
   return subwayRating * subwayImportance * weighting || 0;
@@ -270,7 +270,7 @@ function playareaValuation(feature) {
 
   var playareaRating = (playgroundRating * 3 + soccerRating) / 4;
 
-  // Custom weighting -> how important is personal distance in general?
+  // Custom weighting -> how important is this rating?
   var weighting = 1;
 
   return playareaRating * playgroundImportance * weighting || 0;
@@ -279,7 +279,7 @@ function playareaValuation(feature) {
 function parkValuation(feature) {
   var parkRating = feature.properties.park_ratings;
 
-  // Custom weighting -> how important is personal distance in general?
+  // Custom weighting -> how important is this rating?
   var weighting = 2;
 
   if (parkRating > 0.2) {
@@ -299,7 +299,7 @@ function vibrantValuation(feature) {
 
   var vibrantRating = (restaurantRating * 2 + populationRating) / 3;
 
-  // Custom weighting -> how important is personal distance in general?
+  // Custom weighting -> how important is this rating?
   var weighting = 1;
 
   return vibrantRating * vibrantImportance * weighting || 0;
@@ -309,7 +309,7 @@ function rentalValuation(feature) {
   // Invert value -> lowest prices should give positive rating
   var rentalRating = 1 - feature.properties.rental_rating;
 
-  // Custom weighting -> how important is personal distance in general?
+  // Custom weighting -> how important is this rating?
   var weighting = 5;
 
   return rentalRating * rentalImportance * rentalImportance * weighting || 0;
@@ -318,7 +318,7 @@ function rentalValuation(feature) {
 function schoolValuation(feature) {
   var schoolRating = feature.properties.school_rating;
 
-  // Custom weighting -> how important is personal distance in general?
+  // Custom weighting -> how important is this rating?
   var weighting = 1;
 
   return schoolRating * schoolImportance * weighting || 0;
@@ -327,7 +327,7 @@ function schoolValuation(feature) {
 function parkingValuation(feature) {
   var parkingRating = feature.properties.parking_rating;
 
-  // Custom weighting -> how important is personal distance in general?
+  // Custom weighting -> how important is this rating?
   var weighting = 0.6;
 
   return parkingRating * parkingImportance * weighting|| 0;
@@ -336,7 +336,7 @@ function parkingValuation(feature) {
 function universityValuation(feature) {
   var universityRating = feature.properties.university_rating;
 
-  // Custom weighting -> how important is personal distance in general?
+  // Custom weighting -> how important is this rating?
   var weighting = 1;
 
   return  universityRating * universityImportance * weighting|| 0;
@@ -350,7 +350,7 @@ function centerDistanceValuation(feature) {
   // Inverse value -> 1 is best (closer is better)
   var rating = (1 - centerDistance);
 
-  // Custom weighting -> how important is personal distance in general?
+  // Custom weighting -> how important is this rating?
   var weighting = 1;
 
   return rating * centerImportance * weighting|| 0;
@@ -364,12 +364,11 @@ function personalDistanceValuation(feature) {
   // Inverse value -> 1 is best
   var rating = (1 - personalDistance);
 
-  // Custom weighting -> how important is personal distance in general?
+  // Custom weighting -> how important is this rating?
   var weighting = 2.5;
 
   return rating * personalDistanceImportance * weighting || 0;
 }
-// TODO: Add proper valuation functions for different feature aspects
 
 
 ////////////////////////////////////
